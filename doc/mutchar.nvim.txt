@@ -176,7 +176,8 @@ EXAMPLE USAGE ~
 <
 
 
-My usage <https://github.com/glepnir/nvim/lua/modules/editor/config.lua>
+My usage
+<https://github.com/glepnir/nvim/blob/main/lua/modules/editor/config.lua#L102>
 
 LICENSE MIT                                         *mutchar.nvim-license-mit*
 
