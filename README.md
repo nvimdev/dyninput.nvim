@@ -150,6 +150,6 @@ require('mutchar').setup({
 })
 ```
 
-[My usage](https://github.com/glepnir/nvim/lua/modules/editor/config.lua)
+[My usage](https://github.com/glepnir/nvim/blob/main/lua/modules/editor/config.lua#L102)
 
 ## License MIT
