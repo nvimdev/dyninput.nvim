@@ -24,7 +24,7 @@ argument in `setup` function it's a table type that key is filetype value is tab
 {
     [filetype] = {
         rules      -- type is table,
-        filer      -- type is function|table|nil
+        filter      -- type is function|table|nil
         one_to_one -- type is boolean only work when filter is table and  each element of
                       rules is table
     }
