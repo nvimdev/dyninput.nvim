@@ -133,7 +133,7 @@ there has some default filters functions
 CUSTOME FILTER ~
 
 you can custom filter function to determine whether the conditions for changing
-characters are met and it return a bollen type
+characters are met and it return a boolean type
 
 like:
 
