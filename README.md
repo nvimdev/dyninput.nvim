@@ -95,14 +95,14 @@ filters.find_diagnostic_msg(patterns)
 -- works for cpp check current text is `tempalte` or not
 filters.generic_in_cpp(opt)
 
--- works for `;` in rust file
+-- works for `;` in rust file need treesitter
 filters.semicolon_in_rust(opt)
--- works for '-' in rust file
+-- works for '-' in rust file need treesitter
 filters.minus_in_rust(opt)
--- works for `<>` in rust file
+-- works for `<>` in rust file need treesitter
 filters.generic_in_rust(opt)
 
--- works for go file symbol <-
+-- works for go file symbol <- need treesitter
 filters.go_arrow_symbol(opt)
 ```
 
