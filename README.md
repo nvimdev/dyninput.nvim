@@ -109,7 +109,7 @@ filters.go_arrow_symbol(opt)
 ### Custome filter
 
 you can custom filter function to determine whether the conditions for changing characters are met
-and it return a bollen type
+and it return a boolean type
 
 like:
 
