@@ -2,6 +2,8 @@
 
 a neovim plugin that change type character to other characters accroding rules and filter.
 
+![images](https://user-images.githubusercontent.com/41671631/211135355-dddb0ecf-32e6-454c-9988-657e6165a90f.gif)
+
 ## Install
 
 For lazy.nvim
