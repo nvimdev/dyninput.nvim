@@ -15,6 +15,11 @@ Table of Contents                             *mutchar.nvim-table-of-contents*
 a neovim plugin that change type character to other characters accroding rules
 and filter.
 
+<div class="figure">
+<img src="https://user-images.githubusercontent.com/41671631/211135355-dddb0ecf-32e6-454c-9988-657e6165a90f.gif" title="fig:"/>
+<p class="caption">images</p>
+</div>
+
 INSTALL                                                 *mutchar.nvim-install*
 
 For lazy.nvim
