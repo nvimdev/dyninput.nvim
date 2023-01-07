@@ -73,7 +73,7 @@ local function ts_query_and_node()
 end
 
 ---@private
-local function ts_captures_at_line(opt, callback)
+local function ts_captures_at_line(opt)
   local parent_node, query = ts_query_and_node()
   if not query then
     vim.notify('[mutchar.nvim] get treesitter query failed', vim.log.levels.ERROR)
@@ -81,13 +81,10 @@ local function ts_captures_at_line(opt, callback)
   end
 
   local types = {}
-  for id, node, _ in query:iter_captures(parent_node, 0, opt.lnum, opt.lnum + 1) do
+  for id, _, _ in query:iter_captures(parent_node, 0, opt.lnum, opt.lnum + 1) do
     local name = query.captures[id] -- name of the capture in the query
-    local node_srow, _, node_erow, node_ecol = node:range()
+    -- local node_srow, _, node_erow, node_ecol = node:range()
     table.insert(types, name)
-    if callback and callback(node_srow, node_erow, node_ecol, name) then
-      return true
-    end
   end
 
   return types
@@ -197,14 +194,17 @@ function filters.semicolon_in_rust(opt)
     return false
   end
 
-  local match = function(srow, erow, ecol, name)
+  local parent_node, query = ts_query_and_node()
+  if not query then
+    return
+  end
+
+  for id, node, _ in query:iter_captures(parent_node, 0, opt.lnum, opt.lnum + 1) do
+    local name = query.captures[id] -- name of the capture in the query
+    local srow, _, erow, ecol = node:range()
     if equals_lnum_col(srow, erow, ecol, opt) and name == 'variable' then
       return true
     end
-    return false
-  end
-  if ts_captures_at_line(opt, match) then
-    return true
   end
 
   local text = vim.api.nvim_get_current_line()
