@@ -1,4 +1,4 @@
-*mutchar.nvim.txt*         For NVIM v0.8.0        Last change: 2023 January 07
+*mutchar.nvim.txt*         For NVIM v0.8.0        Last change: 2023 January 11
 
 ==============================================================================
 Table of Contents                             *mutchar.nvim-table-of-contents*
@@ -132,6 +132,9 @@ there has some default filters functions
     
     -- works for go file symbol <- need treesitter
     filters.go_arrow_symbol(opt)
+    
+    -- works for `;` in lua file changed to `:` before word is self
+    filters.semicolon_in_lua(opt)
 <
 
 
