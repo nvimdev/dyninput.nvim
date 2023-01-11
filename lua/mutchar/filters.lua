@@ -135,6 +135,14 @@ local function ts_node_type_start()
   }
 end
 
+function filters.semicolon_in_lua(opt)
+  local text = vim.api.nvim_get_current_line()
+  if text:sub(#text - 4, #text) == 'self' then
+    return true
+  end
+  return false
+end
+
 function filters.go_arrow_symbol(opt)
   local need_match = {
     'string',

@@ -106,6 +106,9 @@ filters.generic_in_rust(opt)
 
 -- works for go file symbol <- need treesitter
 filters.go_arrow_symbol(opt)
+
+-- works for `;` in lua file changed to `:` before word is self
+filters.semicolon_in_lua(opt)
 ```
 
 ### Custome filter
