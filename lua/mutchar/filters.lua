@@ -140,6 +140,13 @@ function filters.semicolon_in_lua(opt)
   if text:sub(#text - 4, #text) == 'self' then
     return true
   end
+  local types = ts_captures_at_line(opt)
+  if not types then
+    return false
+  end
+  if types[#types] == 'variable' then
+    return true
+  end
   return false
 end
 
