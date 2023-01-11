@@ -133,7 +133,9 @@ there has some default filters functions
     -- works for go file symbol <- need treesitter
     filters.go_arrow_symbol(opt)
     
-    -- works for `;` in lua file changed to `:` before word is self
+    -- works for `;` in lua file changed to `:`
+    -- when before word is a variable or it's self
+    -- then filter will affact
     filters.semicolon_in_lua(opt)
 <
 
