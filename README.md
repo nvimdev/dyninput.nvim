@@ -4,7 +4,7 @@ a neovim plugin that change type character to other characters accroding rules a
 
 ![images](https://user-images.githubusercontent.com/41671631/211135355-dddb0ecf-32e6-454c-9988-657e6165a90f.gif)
 
-## Install
+# Install
 
 For lazy.nvim
 
@@ -18,7 +18,7 @@ require('lazy').setup(
 )
 ```
 
-## Config
+# Config
 
 argument in `setup` function it's a table type that key is filetype value is table
 
@@ -72,7 +72,7 @@ filter = {
 }
 ```
 
-## Filters
+# Filters
 
 `filter` is `function|table|nil` each element is function. 
 
@@ -113,7 +113,7 @@ filters.go_arrow_symbol(opt)
 filters.semicolon_in_lua(opt)
 ```
 
-### Custome filter
+## Custome filter
 
 you can custom filter function to determine whether the conditions for changing characters are met
 and it return a boolean type
@@ -132,7 +132,7 @@ local function custom_filter(opt)
 end
 ```
 
-### Example usage
+## Example usage
 
 ```lua
 local filters = require('mutchar.filters')
@@ -159,4 +159,4 @@ require('mutchar').setup({
 
 [My usage](https://github.com/glepnir/nvim/blob/main/lua/modules/editor/config.lua#L102)
 
-## License MIT
+# License MIT
