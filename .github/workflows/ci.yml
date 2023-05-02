@@ -13,6 +13,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --check .
 
+  luacheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Luacheck
+        uses: lunarmodules/luacheck@v0.26.0
+
   docs:
     runs-on: ubuntu-latest
     name: pandoc to vimdoc
@@ -30,3 +36,22 @@ jobs:
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
           commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: nightly
+
+      - name: Install plenary
+        run: |
+          git clone --depth 1 https://github.com/nvim-lua/plenary.nvim ~/.local/share/nvim/site/pack/test/start/plenary.nvim
+          ln -s $(pwd) ~/.local/share/nvim/site/pack/test/start
+
+      - name: Run tests
+        run: nvim --headless --noplugin -c 'packadd plenary.nvim' -c "PlenaryBustedDirectory tests/ { minimal_init = 'tests/minimal_init.lua' }"

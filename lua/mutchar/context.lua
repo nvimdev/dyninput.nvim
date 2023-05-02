@@ -1,32 +1,75 @@
-local filters = {}
+local ctx = {}
 
-local function filters_factor(fn)
+local function factory(fn)
   return function(opt)
     return fn(opt)
   end
 end
 
 ---check diagnostic have the string
-function filters.find_diagnostic_msg(patterns)
-  vim.validate({
-    patterns = { 'patterns', { 's', 't' } },
-  })
-  patterns = type(patterns) == 'string' and { patterns } or patterns
-
+function ctx.diagnostic_match(pattern)
   local function check_diag(opt)
-    local diagnostics = vim.diagnostic.get(opt.buf, { lnum = opt.lnum })
-    for _, diag in pairs(diagnostics) do
-      if diag.message then
-        for _, pattern in pairs(patterns) do
-          if diag.message:find(pattern) then
-            return true
-          end
-        end
+    local diagnostics = vim.diagnostic.get(opt.buf, { lnum = opt.lnum - 1 })
+    if next(diagnostics) == nil then
+      return false
+    end
+    local it = vim.iter(diagnostics):find(function(item)
+      return item.message:find(pattern)
+    end)
+    return it and true or false
+  end
+  return factory(check_diag)
+end
+
+local function binary_search(symbols, line)
+  local left, right, mid = 1, #symbols, 0
+  while true do
+    mid = bit.rshift(left + right, 1)
+    if mid == 0 then
+      return nil
+    end
+
+    local range = symbols[mid].range or symbols[mid].selectionRange
+
+    if line >= range.start.line and line <= range['end'].line then
+      return mid
+    elseif line < range.start.line then
+      right = mid - 1
+      if left > right then
+        return nil
+      end
+    else
+      left = mid + 1
+      if left > right then
+        return nil
       end
     end
-    return false
   end
-  return filters_factor(check_diag)
+end
+
+function ctx.lsp_symbol_match(target)
+  return function(opt)
+    local bufnr = vim.api.nvim_get_current_buf()
+    local clients = vim.lsp.get_active_clients({ buf = bufnr })
+    local client = vim.iter(clients):find(function(item)
+      return item.server_capabilities.documentSymbolProvider
+    end)
+    if not client then
+      return false
+    end
+
+    local params = { textDocument = vim.lsp.util.make_text_document_params() }
+    client.request('textDocument/documentSymbol', params, function(err, result, _)
+      if err then
+        return false
+      end
+      local index = binary_search(result, opt.lnum)
+      local kind = result[index].kind
+      if kind == target then
+        return true
+      end
+    end, bufnr)
+  end
 end
 
 local function find_space(opt)
@@ -37,26 +80,28 @@ local function find_space(opt)
   return false
 end
 
-function filters.non_space_before(opt)
+function ctx.non_space_before(opt)
   if not find_space(opt) then
     return true
   end
   return false
 end
 
-function filters.has_space_before(opt)
+function ctx.has_space_before(opt)
   return find_space(opt)
 end
 
-local function ts_query_and_node()
+local function ts_query_and_node(opt)
   local ok, _ = pcall(require, 'nvim-treesitter')
   if not ok then
     vim.notify('[mutchar.nvim] this filter need install treesitter')
     return
   end
 
-  local ts_utils = require('nvim-treesitter.ts_utils')
-  local current_node = ts_utils.get_node_at_cursor()
+  local current_node = vim.treesitter.get_node({
+    bufnr = opt.buf,
+    pos = { opt.lnum, opt.col },
+  })
   if not current_node then
     return
   end
@@ -65,17 +110,19 @@ local function ts_query_and_node()
   if not parent_node then
     parent_node = current_node
   end
-  local queries = require('nvim-treesitter.query')
-  local ft_to_lang = require('nvim-treesitter.parsers').ft_to_lang
-  local query = queries.get_query(ft_to_lang('rust'), 'highlights')
+  local lang = vim.treesitter.language.get_lang(vim.bo[opt.buf].filetype)
+  if not lang then
+    return nil
+  end
+  local query = vim.treesitter.query.get(lang, 'highlights')
 
   return parent_node, query
 end
 
 ---@private
 local function ts_captures_at_line(opt)
-  local parent_node, query = ts_query_and_node()
-  if not query then
+  local parent_node, query = ts_query_and_node(opt)
+  if not query or not parent_node then
     vim.notify('[mutchar.nvim] get treesitter query failed', vim.log.levels.ERROR)
     return
   end
@@ -135,7 +182,7 @@ local function ts_node_type_start()
   }
 end
 
-function filters.semicolon_in_lua(opt)
+function ctx.semicolon_in_lua(opt)
   local text = vim.api.nvim_get_current_line()
   if text:sub(#text - 4, #text) == 'self' then
     return true
@@ -150,23 +197,9 @@ function filters.semicolon_in_lua(opt)
   return false
 end
 
-function filters.go_arrow_symbol(opt)
-  local need_match = {
-    'string',
-    'operator',
-    'variable',
-    'function.macro',
-  }
-  local types = ts_captures_at_line(opt)
-  if not types then
-    return false
-  end
-  return tbl_filter({ need_match }, types)
-end
-
-function filters.generic_in_rust(opt)
-  local parent_node, query = ts_query_and_node()
-  if not query then
+function ctx.generic_in_rust(opt)
+  local parent_node, query = ts_query_and_node(opt)
+  if not query or not parent_node then
     return
   end
 
@@ -190,7 +223,7 @@ function filters.generic_in_rust(opt)
   return false
 end
 
-function filters.minus_in_rust(opt)
+function ctx.ret_arrow(opt)
   local types = ts_captures_at_line(opt)
   if not types then
     return false
@@ -204,14 +237,14 @@ function filters.minus_in_rust(opt)
   return false
 end
 
-function filters.semicolon_in_rust(opt)
+function ctx.semicolon_in_rust(opt)
   if find_space(opt) then
     return false
   end
 
-  local parent_node, query = ts_query_and_node()
-  if not query then
-    return
+  local parent_node, query = ts_query_and_node(opt)
+  if not query or not parent_node then
+    return false
   end
 
   for id, node, _ in query:iter_captures(parent_node, 0, opt.lnum, opt.lnum + 1) do
@@ -230,7 +263,7 @@ function filters.semicolon_in_rust(opt)
   return true
 end
 
-function filters.generic_in_cpp(opt)
+function ctx.generic_in_cpp()
   local text = vim.api.nvim_get_current_line()
   if text == 'template' then
     return true
@@ -238,4 +271,4 @@ function filters.generic_in_cpp(opt)
   return false
 end
 
-return filters
+return ctx
