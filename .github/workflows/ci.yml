@@ -43,9 +43,6 @@ jobs:
           neovim: true
           version: nightly
 
-      - name: Luacheck
-        uses: lunarmodules/luacheck@v0.26.0
-
       - name: luajit
         uses: leafo/gh-actions-lua@v8
         with:
@@ -57,5 +54,6 @@ jobs:
       - name: run test
         shell: bash
         run: |
+          luarocks install luacheck
           luarocks install vusted
           vusted ./tests/mutchar_spec.lua
