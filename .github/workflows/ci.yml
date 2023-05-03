@@ -9,6 +9,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Stylua
         uses: JohnnyMorganz/stylua-action@v3
+        version: latest
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --check .
@@ -26,6 +27,13 @@ jobs:
 
       - name: luarocks
         uses: leafo/gh-actions-luarocks@v4
+
+      - name: Setup tools
+        shell: bash
+        run: |
+          luarocks install luacheck
+          luarocks install vusted- run: luarocks install vusted
+
 
   docs:
     runs-on: ubuntu-latest
@@ -55,5 +63,4 @@ jobs:
           neovim: true
           version: nightly
 
-      - run: luarocks --lua-version=5.1 install vusted
       - run: vusted ./tests/mutchar_spec.lua
