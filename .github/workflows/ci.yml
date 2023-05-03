@@ -8,16 +8,24 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Stylua
-        uses: JohnnyMorganz/stylua-action@v1.1.2
+        uses: JohnnyMorganz/stylua-action@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --check .
 
-  luacheck:
+  tools:
     runs-on: ubuntu-latest
     steps:
       - name: Luacheck
         uses: lunarmodules/luacheck@v0.26.0
+
+      - name: luajit
+        uses: leafo/gh-actions-lua@v8
+        with:
+          luaVersion: "luajit-2.1.0-beta3"
+
+      - name: luarocks
+        uses: leafo/gh-actions-luarocks@v4
 
   docs:
     runs-on: ubuntu-latest
@@ -36,12 +44,6 @@ jobs:
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
           commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
-
-  tools:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Setup luarocks
-      uses: leafo/gh-actions-luarocks@v4
 
   test:
     runs-on: ubuntu-latest
