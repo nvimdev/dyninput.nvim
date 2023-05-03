@@ -29,10 +29,10 @@ local function buf_map(buf, item)
           end
 
           local new_col = pos + opt.col - 1
-          print(pos, new_col)
           new = new:gsub('!', '')
           api.nvim_buf_set_text(opt.buf, opt.lnum - 1, opt.col, opt.lnum - 1, opt.col, { new })
           api.nvim_win_set_cursor(0, { opt.lnum, new_col })
+          return
         end
       end
 

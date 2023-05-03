@@ -92,16 +92,11 @@ function ctx.has_space_before(opt)
 end
 
 local function ts_query_and_node(opt)
-  local ok, _ = pcall(require, 'nvim-treesitter')
-  if not ok then
-    vim.notify('[mutchar.nvim] this filter need install treesitter')
-    return
-  end
-
   local current_node = vim.treesitter.get_node({
     bufnr = opt.buf,
-    pos = { opt.lnum, opt.col },
+    pos = { opt.lnum - 1, opt.col },
   })
+
   if not current_node then
     return
   end
@@ -114,6 +109,7 @@ local function ts_query_and_node(opt)
   if not lang then
     return nil
   end
+
   local query = vim.treesitter.query.get(lang, 'highlights')
 
   return parent_node, query
@@ -184,7 +180,7 @@ end
 
 function ctx.semicolon_in_lua(opt)
   local text = vim.api.nvim_get_current_line()
-  if text:sub(#text - 4, #text) == 'self' then
+  if text:sub(#text - 3, #text) == 'self' then
     return true
   end
   local types = ts_captures_at_line(opt)

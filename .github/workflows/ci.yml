@@ -37,21 +37,15 @@ jobs:
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
           commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
 
-  tests:
+  test:
     runs-on: ubuntu-latest
+    name: test
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Install Neovim
-        uses: rhysd/action-setup-vim@v1
+      - uses: rhysd/action-setup-vim@v1
+        id: vim
         with:
           neovim: true
           version: nightly
 
-      - name: Install plenary
-        run: |
-          git clone --depth 1 https://github.com/nvim-lua/plenary.nvim ~/.local/share/nvim/site/pack/test/start/plenary.nvim
-          ln -s $(pwd) ~/.local/share/nvim/site/pack/test/start
-
-      - name: Run tests
-        run: nvim --headless --noplugin -c 'packadd plenary.nvim' -c "PlenaryBustedDirectory tests/ { minimal_init = 'tests/minimal_init.lua' }"
+      - run: luarocks --lua-version=5.1 install vusted
+      - run: vuste ./tests/mutchar_spec.lua
