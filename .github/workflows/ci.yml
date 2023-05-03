@@ -14,26 +14,6 @@ jobs:
           version: latest
           args: --check .
 
-  tools:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Luacheck
-        uses: lunarmodules/luacheck@v0.26.0
-
-      - name: luajit
-        uses: leafo/gh-actions-lua@v8
-        with:
-          luaVersion: "luajit-2.1.0-beta3"
-
-      - name: luarocks
-        uses: leafo/gh-actions-luarocks@v4
-
-      - name: Setup tools
-        shell: bash
-        run: |
-          luarocks install luacheck
-          luarocks install vusted- run: luarocks install vusted
-
 
   docs:
     runs-on: ubuntu-latest
@@ -63,4 +43,20 @@ jobs:
           neovim: true
           version: nightly
 
-      - run: vusted ./tests/mutchar_spec.lua
+      - name: Luacheck
+        uses: lunarmodules/luacheck@v0.26.0
+
+      - name: luajit
+        uses: leafo/gh-actions-lua@v8
+        with:
+          luaVersion: "luajit-2.1.0-beta3"
+
+      - name: luarocks
+        uses: leafo/gh-actions-luarocks@v4
+
+      - name: run test
+        shell: bash
+        run: |
+          luarocks install luacheck
+          luarocks install vusted- run: luarocks install vusted
+          vusted ./tests/mutchar_spec.lua
