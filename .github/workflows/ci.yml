@@ -47,7 +47,6 @@ jobs:
       - name: luajit
         uses: leafo/gh-actions-lua@v8
         with:
-          node-version: 16
           luaVersion: "luajit-2.1.0-beta3"
 
       - name: luarocks
