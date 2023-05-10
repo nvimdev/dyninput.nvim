@@ -7,14 +7,17 @@ local function factory(fn)
 end
 
 ---check diagnostic have the string
-function ctx.diagnostic_match(pattern)
+function ctx.diagnostic_match(patterns)
+  patterns = type(patterns) == 'string' and { patterns } or patterns
   local function check_diag(opt)
     local diagnostics = vim.diagnostic.get(opt.buf, { lnum = opt.lnum - 1 })
     if next(diagnostics) == nil then
       return false
     end
     local it = vim.iter(diagnostics):find(function(item)
-      return item.message:find(pattern)
+      return vim.iter(patterns):any(function(pattern)
+        return item.message:find(pattern)
+      end)
     end)
     return it and true or false
   end
@@ -219,7 +222,7 @@ function ctx.generic_in_rust(opt)
   return false
 end
 
-function ctx.ret_arrow(opt)
+function ctx.rust_ret_arrow(opt)
   local types = ts_captures_at_line(opt)
   if not types then
     return false

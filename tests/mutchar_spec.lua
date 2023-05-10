@@ -9,7 +9,7 @@ mutchar.setup({
     [';'] = { ':', ctx.semicolon_in_lua },
   },
   go = {
-    [';'] = { ' := ', ctx.diagnostic_match('undefine') },
+    [';'] = { ' := ', ctx.diagnostic_match({'undefine', 'expression'}) },
   },
 })
 
@@ -42,7 +42,7 @@ describe('mutchar', function()
     assert.equal('function self:', line)
   end)
 
-  it('variable define in go', function()
+  it('single variable define in go', function()
     vim.bo.filetype = 'go'
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'g' })
     local ns = vim.api.nvim_create_namespace('mutchar')
@@ -60,5 +60,26 @@ describe('mutchar', function()
     vim.api.nvim_feedkeys(t('a;'), 'x', false)
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
     assert.equal('g := ', line)
+  end)
+
+  it('multiple variable define in go', function()
+    vim.bo.filetype = 'go'
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'g,t' })
+    vim.api.nvim_win_set_cursor(0, {1,3})
+    local ns = vim.api.nvim_create_namespace('mutchar')
+    vim.diagnostic.set(ns, bufnr, {
+      {
+        bufnr = bufnr,
+        lnum = 0,
+        end_lnum = 1,
+        col = 1,
+        end_col = 1,
+        severity = 1,
+        message = 'expected 1 expression',
+      },
+    })
+    vim.api.nvim_feedkeys(t('a;'), 'x', false)
+    local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
+    assert.equal('g,t := ', line)
   end)
 end)
