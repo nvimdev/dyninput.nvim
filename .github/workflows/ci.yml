@@ -73,5 +73,5 @@ jobs:
 
     - name: Run test with building Nvim
       run: |
-        luarocks install vusted
+        luarocks --lua-version=5.1 install vusted
         vusted ./tests
