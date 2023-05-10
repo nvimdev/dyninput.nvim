@@ -58,3 +58,20 @@ jobs:
           luarocks install luacheck
           luarocks install vusted
           vusted ./tests
+
+  macos:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@v3
+    - name: Setup build dependencies
+      run: |
+        brew install lua@5.1
+        brew install luarocks
+        brew install neovim
+        brew install luajit
+
+    - name: Run test with building Nvim
+      run: |
+        luarocks install vusted
+        make test
