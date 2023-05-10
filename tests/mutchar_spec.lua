@@ -9,7 +9,7 @@ mutchar.setup({
     [';'] = { ':', ctx.semicolon_in_lua },
   },
   go = {
-    [';'] = { ' := ', ctx.diagnostic_match({'undefine', 'expression'}) },
+    [';'] = { ' := ', ctx.diagnostic_match({ 'undefine', 'expression' }) },
   },
 })
 
@@ -65,7 +65,7 @@ describe('mutchar', function()
   it('multiple variable define in go', function()
     vim.bo.filetype = 'go'
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'g,t' })
-    vim.api.nvim_win_set_cursor(0, {1,3})
+    vim.api.nvim_win_set_cursor(0, { 1, 3 })
     local ns = vim.api.nvim_create_namespace('mutchar')
     vim.diagnostic.set(ns, bufnr, {
       {
