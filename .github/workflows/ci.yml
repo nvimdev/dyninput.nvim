@@ -34,8 +34,11 @@ jobs:
           commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
 
   test:
-    runs-on: [ubuntu-latest, macos-latest]
-    name: test
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@v3
       - uses: rhysd/action-setup-vim@v1
