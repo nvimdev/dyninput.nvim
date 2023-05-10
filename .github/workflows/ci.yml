@@ -34,7 +34,7 @@ jobs:
           commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: [ubuntu-latest, macos-latest]
     name: test
     steps:
       - uses: actions/checkout@v3
@@ -58,20 +58,3 @@ jobs:
           luarocks install luacheck
           luarocks install vusted
           vusted ./tests
-
-  macos:
-    runs-on: macos-latest
-    steps:
-    - name: Checkout sources
-      uses: actions/checkout@v3
-    - name: Setup build dependencies
-      run: |
-        brew install luajit
-        brew install neovim
-        brew install lua@5.1
-        brew install luarocks
-        luarocks --lua-version=5.1 install vusted
-
-    - name: Run test with building Nvim
-      run: |
-        vusted ./tests
