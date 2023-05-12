@@ -13,7 +13,7 @@ mutchar.setup({
   },
   rust = {
     [';'] = { '::', ctx.semicolon_in_rust },
-  }
+  },
 })
 
 local t = function(s)
