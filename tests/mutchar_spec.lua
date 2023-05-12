@@ -11,6 +11,9 @@ mutchar.setup({
   go = {
     [';'] = { ' := ', ctx.diagnostic_match({ 'undefine', 'expression' }) },
   },
+  rust = {
+    [';'] = { '::', ctx.semicolon_in_rust },
+  }
 })
 
 local t = function(s)
@@ -82,4 +85,14 @@ describe('mutchar', function()
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
     assert.equal('g,t := ', line)
   end)
+
+  --need treesitter there
+  -- it('semicolon in rust namespace', function()
+  --   vim.bo.filetype = 'rust'
+  --   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'fn main () {', '    let s = String', '}' })
+  --   vim.api.nvim_win_set_cursor(0, {1, 18})
+  --   vim.api.nvim_feedkeys(t('a;'), 'x', false)
+  --   local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
+  --   assert.equal('    let s = String::', line)
+  -- end)
 end)

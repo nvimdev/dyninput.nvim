@@ -1,3 +1,4 @@
+local util = require('mutchar.util')
 local ctx = {}
 
 local function factory(fn)
@@ -94,172 +95,30 @@ function ctx.has_space_before(opt)
   return find_space(opt)
 end
 
-local function ts_query_and_node(opt)
-  local current_node = vim.treesitter.get_node({
-    bufnr = opt.buf,
-    pos = { opt.lnum - 1, opt.col },
-  })
-
-  if not current_node then
-    return
-  end
-
-  local parent_node = current_node:parent()
-  if not parent_node then
-    parent_node = current_node
-  end
-  local lang = vim.treesitter.language.get_lang(vim.bo[opt.buf].filetype)
-  if not lang then
-    return nil
-  end
-
-  local query = vim.treesitter.query.get(lang, 'highlights')
-
-  return parent_node, query
-end
-
----@private
-local function ts_captures_at_line(opt)
-  local parent_node, query = ts_query_and_node(opt)
-  if not query or not parent_node then
-    vim.notify('[mutchar.nvim] get treesitter query failed', vim.log.levels.ERROR)
-    return
-  end
-
-  local types = {}
-  for id, _, _ in query:iter_captures(parent_node, 0, opt.lnum, opt.lnum + 1) do
-    local name = query.captures[id] -- name of the capture in the query
-    -- local node_srow, _, node_erow, node_ecol = node:range()
-    table.insert(types, name)
-  end
-
-  return types
-end
-
----@private
-local function equals_lnum_col(srow, erow, ecol, opt)
-  ecol = ecol or nil
-  if srow == opt.lnum and erow == opt.lnum then
-    if not ecol then
-      return true
-    end
-    if ecol == opt.col then
-      return true
-    else
-      return false
-    end
-  end
-  return false
-end
-
----@private
-local function tbl_filter(t1, t2)
-  vim.validate({
-    t1 = { t1, 't' },
-    t2 = { t2, 't' },
-  })
-  local matched = false
-  for _, need_match in pairs(t1) do
-    for i, v in pairs(t2) do
-      if need_match[i] == v then
-        matched = true
-      end
-    end
-    if matched then
-      break
-    end
-  end
-
-  return matched
-end
-
-local function ts_node_type_start()
-  return {
-    { 'keyword', 'type' },
-    { 'keyword', 'variable' },
-    { 'keyword.function', 'variable' },
-  }
-end
-
 function ctx.semicolon_in_lua(opt)
   local text = vim.api.nvim_get_current_line()
   if text:sub(#text - 3, #text) == 'self' then
     return true
   end
-  local types = ts_captures_at_line(opt)
-  if not types then
-    return false
-  end
-  if types[#types] == 'variable' then
+
+  local nodes = util.ts_node_in_cursor(opt.buf)
+  if vim.iter(nodes):any(function(item)
+    return item.capture == 'variable'
+  end) then
     return true
   end
-  return false
 end
 
-function ctx.generic_in_rust(opt)
-  local parent_node, query = ts_query_and_node(opt)
-  if not query or not parent_node then
-    return
-  end
-
-  local types = {}
-  local match_start = ts_node_type_start()
-  local function ts_match_generic()
-    if #types == 2 and tbl_filter(match_start, types) then
-      return true
-    end
-    return false
-  end
-
-  for id, node, _ in query:iter_captures(parent_node, 0, opt.lnum, opt.lnum + 1) do
-    local name = query.captures[id] -- name of the capture in the query
-    table.insert(types, name)
-    local srow, _, erow, ecol = node:range()
-    if equals_lnum_col(srow, erow, ecol, opt) and ts_match_generic() then
-      return true
-    end
-  end
-  return false
-end
-
-function ctx.rust_ret_arrow(opt)
-  local types = ts_captures_at_line(opt)
-  if not types then
-    return false
-  end
-
-  local tbl = ts_node_type_start()[3]
-
-  if types[1] == tbl[1] and types[2] == tbl[2] and types[#types] == 'punctuation.delimiter' then
-    return true
-  end
-  return false
-end
+-- function ctx.generic_in_rust(opt) end
 
 function ctx.semicolon_in_rust(opt)
-  if find_space(opt) then
-    return false
+  local nodes = util.ts_node_in_cursor(opt.buf)
+  if vim.iter(nodes):any(function(item)
+    return item.capture == 'type'
+  end) then
+    return true
   end
-
-  local parent_node, query = ts_query_and_node(opt)
-  if not query or not parent_node then
-    return false
-  end
-
-  for id, node, _ in query:iter_captures(parent_node, 0, opt.lnum, opt.lnum + 1) do
-    local name = query.captures[id] -- name of the capture in the query
-    local srow, _, erow, ecol = node:range()
-    if equals_lnum_col(srow, erow, ecol, opt) and name == 'variable' then
-      return true
-    end
-  end
-
-  local text = vim.api.nvim_get_current_line()
-  if opt.col == tonumber(vim.api.nvim_strwidth(text)) then
-    return false
-  end
-
-  return true
+  return false
 end
 
 function ctx.generic_in_cpp()
