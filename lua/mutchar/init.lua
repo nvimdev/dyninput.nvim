@@ -21,7 +21,7 @@ local function buf_map(buf, item)
 
       for _, rule in ipairs(rules) do
         local new, filter = unpack(rule)
-        if filter(opt) then
+        if filter and filter(opt) then
           local pos = new:find('!')
           if not pos then
             flush_new(opt, new)

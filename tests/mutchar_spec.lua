@@ -1,5 +1,6 @@
 local mutchar = require('mutchar')
 local ctx = require('mutchar.context')
+local ns = vim.api.nvim_create_namespace('mutchar')
 
 mutchar.setup({
   cpp = {
@@ -12,7 +13,10 @@ mutchar.setup({
     [';'] = { ' := ', ctx.diagnostic_match({ 'undefine', 'expression' }) },
   },
   rust = {
-    [';'] = { '::', ctx.semicolon_in_rust },
+    [';'] = {
+      { '::', ctx.rust_double_colon },
+      { ':', ctx.diagnostic_match('expected COLON') },
+    },
   },
 })
 
@@ -48,7 +52,6 @@ describe('mutchar', function()
   it('single variable define in go', function()
     vim.bo.filetype = 'go'
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'g' })
-    local ns = vim.api.nvim_create_namespace('mutchar')
     vim.diagnostic.set(ns, bufnr, {
       {
         bufnr = bufnr,
@@ -86,13 +89,32 @@ describe('mutchar', function()
     assert.equal('g,t := ', line)
   end)
 
-  --need treesitter there
-  -- it('semicolon in rust namespace', function()
-  --   vim.bo.filetype = 'rust'
-  --   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'fn main () {', '    let s = String', '}' })
-  --   vim.api.nvim_win_set_cursor(0, {1, 18})
-  --   vim.api.nvim_feedkeys(t('a;'), 'x', false)
-  --   local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
-  --   assert.equal('    let s = String::', line)
-  -- end)
+  it('rust double colon', function()
+    vim.bo.filetype = 'rust'
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'fn main () {', '    let s = String', '}' })
+    vim.api.nvim_win_set_cursor(0, { 2, 18 })
+    vim.api.nvim_feedkeys(t('a;'), 'x', false)
+    local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
+    assert.equal('    let s = String::', line)
+  end)
+
+  it('rust colon in struct', function()
+    vim.bo.filetype = 'rust'
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'struct Test {', '    username', '}' })
+    vim.api.nvim_win_set_cursor(0, { 2, 11 })
+    vim.diagnostic.set(ns, bufnr, {
+      {
+        bufnr = bufnr,
+        lnum = 1,
+        end_lnum = 2,
+        col = 12,
+        end_col = 12,
+        severity = 1,
+        message = 'expected COLON',
+      },
+    })
+    vim.api.nvim_feedkeys(t('a;'), 'x', false)
+    local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
+    assert.equal('    username:', line)
+  end)
 end)

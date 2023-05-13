@@ -25,57 +25,6 @@ function ctx.diagnostic_match(patterns)
   return factory(check_diag)
 end
 
-local function binary_search(symbols, line)
-  local left, right, mid = 1, #symbols, 0
-  while true do
-    mid = bit.rshift(left + right, 1)
-    if mid == 0 then
-      return nil
-    end
-
-    local range = symbols[mid].range or symbols[mid].selectionRange
-
-    if line >= range.start.line and line <= range['end'].line then
-      return mid
-    elseif line < range.start.line then
-      right = mid - 1
-      if left > right then
-        return nil
-      end
-    else
-      left = mid + 1
-      if left > right then
-        return nil
-      end
-    end
-  end
-end
-
-function ctx.lsp_symbol_match(target)
-  return function(opt)
-    local bufnr = vim.api.nvim_get_current_buf()
-    local clients = vim.lsp.get_active_clients({ buf = bufnr })
-    local client = vim.iter(clients):find(function(item)
-      return item.server_capabilities.documentSymbolProvider
-    end)
-    if not client then
-      return false
-    end
-
-    local params = { textDocument = vim.lsp.util.make_text_document_params() }
-    client.request('textDocument/documentSymbol', params, function(err, result, _)
-      if err then
-        return false
-      end
-      local index = binary_search(result, opt.lnum)
-      local kind = result[index].kind
-      if kind == target then
-        return true
-      end
-    end, bufnr)
-  end
-end
-
 local function find_space(opt)
   local before = vim.api.nvim_buf_get_text(opt.buf, opt.lnum, opt.col - 1, opt.lnum, opt.col, {})[1]
   if before == ' ' then
@@ -100,25 +49,26 @@ function ctx.semicolon_in_lua(opt)
   if text:sub(#text - 3, #text) == 'self' then
     return true
   end
-
-  local nodes = util.ts_node_in_cursor(opt.buf)
-  if vim.iter(nodes):any(function(item)
-    return item.capture == 'variable'
-  end) then
-    return true
-  end
 end
 
 -- function ctx.generic_in_rust(opt) end
 
-function ctx.semicolon_in_rust(opt)
-  local nodes = util.ts_node_in_cursor(opt.buf)
-  if vim.iter(nodes):any(function(item)
-    return item.capture == 'type'
-  end) then
+--match module
+--match type
+function ctx.rust_double_colon(opt)
+  local list = { 'String', 'std' }
+  local word = util.word_before(opt)
+  if not word then
+    return
+  end
+  --match mod
+  if util.ts_node_match('namespace', word, opt) then
     return true
   end
-  return false
+  --match builtin type
+  if vim.tbl_contains(list, word) then
+    return true
+  end
 end
 
 function ctx.generic_in_cpp()
