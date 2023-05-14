@@ -53,20 +53,20 @@ end
 
 -- function ctx.generic_in_rust(opt) end
 
---match module
---match type
 function ctx.rust_double_colon(opt)
-  local list = { 'String', 'std' }
   local word = util.word_before(opt)
   if not word then
     return
   end
-  --match mod
-  if util.ts_node_match('namespace', word, opt) then
+  --match builtin type
+  local list = { 'String', 'std' }
+  if vim.tbl_contains(list, word) then
     return true
   end
-  --match builtin type
-  if vim.tbl_contains(list, word) then
+
+  local type = { 'enum', 'namespace' }
+  --match module/enum
+  if util.ts_node_match(type, word, opt) then
     return true
   end
 end
