@@ -1,15 +1,41 @@
 local treesitter, api = vim.treesitter, vim.api
 
-local function ts_node_match(type, word, opt)
-  local lang = treesitter.language.get_lang(vim.bo[opt.buf].filetype)
+local function ts_highlight_query(buf)
+  local lang = treesitter.language.get_lang(vim.bo[buf].filetype)
   if not lang then
     return
   end
-  local query = treesitter.query.get(lang, 'highlights')
+  return treesitter.query.get(lang, 'highlights')
+end
+
+local function ts_cursor_node(buf)
+  local curnode = treesitter.get_node({ bufnr = buf })
+  return curnode
+end
+
+local function ts_cursor_hl_match(type, opt)
+  local query = ts_highlight_query(opt.buf)
   if not query then
     return
   end
-  local curnode = treesitter.get_node({ bufnr = opt.buf })
+  local curnode = ts_cursor_node(opt.buf)
+  if not curnode then
+    return
+  end
+  for id, _, _ in query:iter_captures(curnode, opt.buf, 0, opt.lnum) do
+    local name = query.captures[id]
+    if type == name then
+      return true
+    end
+  end
+end
+
+local function ts_node_match(type, word, opt)
+  local query = ts_highlight_query(opt.buf)
+  if not query then
+    return
+  end
+  local curnode = ts_cursor_node(opt.buf)
   if not curnode then
     return
   end
@@ -25,7 +51,6 @@ local function ts_node_match(type, word, opt)
   for id, node, _ in query:iter_captures(root, opt.buf, 0, opt.lnum) do
     local name = query.captures[id]
     local text = treesitter.get_node_text(node, opt.buf)
-    print(name, '|', text, '|', word)
     if text == word and vim.tbl_contains(type, name) then
       return true
     end
@@ -39,6 +64,9 @@ local function word_before(opt)
 end
 
 return {
+  ts_cursor_hl_match = ts_cursor_hl_match,
+  ts_highlight_query = ts_highlight_query,
+  ts_cursor_node = ts_cursor_node,
   ts_node_match = ts_node_match,
   word_before = word_before,
 }

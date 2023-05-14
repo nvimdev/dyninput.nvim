@@ -51,7 +51,15 @@ function ctx.semicolon_in_lua(opt)
   end
 end
 
--- function ctx.generic_in_rust(opt) end
+function ctx.rust_single_colon(opt)
+  local word = util.word_before(opt)
+  if not word then
+    return
+  end
+  if util.ts_cursor_hl_match('variable', opt) then
+    return true
+  end
+end
 
 function ctx.rust_double_colon(opt)
   local word = util.word_before(opt)
