@@ -62,6 +62,9 @@ function ctx.rust_single_colon(opt)
   if util.ts_cursor_hl_match('variable', opt) then
     return true
   end
+  if ctx.diagnostic_match('expected COLON') then
+    return true
+  end
 end
 
 function ctx.rust_double_colon(opt)

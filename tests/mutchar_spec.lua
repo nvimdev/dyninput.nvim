@@ -16,7 +16,7 @@ mutchar.setup({
   rust = {
     [';'] = {
       { '::', ctx.rust_double_colon },
-      { ':', ctx.diagnostic_match('expected COLON') },
+      { ': ', ctx.rust_single_colon },
     },
   },
 })
@@ -36,8 +36,8 @@ local function treesitter_dep()
 
   local package_root = join_paths(data_path, 'test')
   local treesitter_path = join_paths(package_root, 'nvim-treesitter')
-  vim.opt.runtimepath:append(treesitter_path)
 
+  vim.opt.runtimepath:append(treesitter_path)
   if vim.fn.isdirectory(treesitter_path) ~= 1 then
     vim.fn.system({
       'git',
@@ -46,14 +46,20 @@ local function treesitter_dep()
       treesitter_path,
     })
   end
+  local parser_dir = join_paths(treesitter_path, 'parser')
   require('nvim-treesitter').setup({
     ensure_installed = { 'rust' },
     sync_install = true,
     highlight = { enable = true },
+    parser_install_dir = parser_dir,
   })
+  if vim.fn.filereadable(join_paths(parser_dir, 'rust.so')) == 0 then
+    vim.cmd('TSInstallSync rust')
+  end
 end
 
 describe('mutchar', function()
+  treesitter_dep()
   local bufnr
   before_each(function()
     bufnr = vim.api.nvim_create_buf(true, true)
@@ -129,8 +135,50 @@ describe('mutchar', function()
       eq('    let s = String::', line)
     end)
 
+    it('after module', function()
+      vim.bo.filetype = 'rust'
+      vim.api.nvim_buf_set_lines(
+        bufnr,
+        0,
+        -1,
+        false,
+        { 'mod module;', 'fn main(){', '    module', '}' }
+      )
+      vim.cmd('TSBufEnable highlight')
+      vim.api.nvim_win_set_cursor(0, { 3, 9 })
+      vim.api.nvim_feedkeys(t('a;'), 'x', false)
+      local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[3]
+      eq('    module::', line)
+    end)
+
+    it('after std use', function()
+      vim.bo.filetype = 'rust'
+      vim.api.nvim_buf_set_lines(
+        bufnr,
+        0,
+        -1,
+        false,
+        { 'use std::io;', 'fn main(){', '    io', '}' }
+      )
+      vim.cmd('TSBufEnable highlight')
+      vim.treesitter.query.set(
+        'rust',
+        'highlights',
+        [[
+        (use_declaration
+          (scoped_identifier
+            name: (identifier) @namespace))
+      ]]
+      )
+      vim.api.nvim_win_set_cursor(0, { 3, 9 })
+      vim.api.nvim_feedkeys(t('a;'), 'x', false)
+      local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[3]
+      eq('    io::', line)
+    end)
+
     it('in struct with diagnsotic', function()
       vim.bo.filetype = 'rust'
+      vim.cmd('TSBufDisable highlight')
       vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'struct Test {', '    username', '}' })
       vim.api.nvim_win_set_cursor(0, { 2, 11 })
       vim.diagnostic.set(ns, bufnr, {
@@ -146,7 +194,7 @@ describe('mutchar', function()
       })
       vim.api.nvim_feedkeys(t('a;'), 'x', false)
       local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
-      eq('    username:', line)
+      eq('    username: ', line)
     end)
   end)
 end)
