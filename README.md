@@ -2,7 +2,11 @@
 
 change the input character according the context need neovim 0.10+
 
+Note: In develope may breakchange any time
+
 ## Install
+
+must neovim 0.10+(head) version
 
 - Lazy.nvim
 
