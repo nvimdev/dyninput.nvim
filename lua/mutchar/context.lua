@@ -53,6 +53,9 @@ end
 
 function ctx.rust_single_colon(opt)
   local word = util.word_before(opt)
+  if not word or word:find('%d') then
+    return
+  end
   if not word then
     return
   end
