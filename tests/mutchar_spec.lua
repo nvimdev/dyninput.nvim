@@ -35,16 +35,21 @@ local function treesitter_dep()
   local data_path = vim.fn.stdpath('data')
 
   local package_root = join_paths(data_path, 'test')
-  local treesitter_path = join_paths(package_root,'nvim-treesitter')
+  local treesitter_path = join_paths(package_root, 'nvim-treesitter')
   vim.opt.runtimepath:append(treesitter_path)
 
   if vim.fn.isdirectory(treesitter_path) ~= 1 then
-    vim.fn.system({ 'git', 'clone', 'https://github.com/nvim-treesitter/nvim-treesitter',treesitter_path })
+    vim.fn.system({
+      'git',
+      'clone',
+      'https://github.com/nvim-treesitter/nvim-treesitter',
+      treesitter_path,
+    })
   end
   require('nvim-treesitter').setup({
-    ensure_installed = {'rust'},
+    ensure_installed = { 'rust' },
     sync_install = true,
-    highlight = { enable = true }
+    highlight = { enable = true },
   })
 end
 
