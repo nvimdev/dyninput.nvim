@@ -1,4 +1,4 @@
-*mutchar.nvim.txt*           For NVIM v0.8.0          Last change: 2023 May 14
+*mutchar.nvim.txt*           For NVIM v0.8.0          Last change: 2023 May 15
 
 ==============================================================================
 Table of Contents                             *mutchar.nvim-table-of-contents*
@@ -13,8 +13,12 @@ Table of Contents                             *mutchar.nvim-table-of-contents*
 
 change the input character according the context need neovim 0.10+
 
+Note: In develope may breakchange any time
+
 
 INSTALL                                    *mutchar.nvim-mutchar.nvim-install*
+
+must neovim 0.10+(head) version
 
 - Lazy.nvim
 
