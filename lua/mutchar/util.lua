@@ -1,5 +1,11 @@
 local treesitter, api = vim.treesitter, vim.api
 
+local function word_before(opt)
+  local line = api.nvim_buf_get_text(opt.buf, opt.lnum - 1, 0, opt.lnum - 1, opt.col, {})[1]
+  local word = string.match(line:sub(1, opt.col), '%w+$') or nil
+  return word
+end
+
 local function ts_highlight_query(buf)
   local lang = treesitter.language.get_lang(vim.bo[buf].filetype)
   if not lang then
@@ -13,7 +19,7 @@ local function ts_cursor_node(buf)
   return curnode
 end
 
-local function ts_cursor_hl_match(type, opt)
+local function ts_cursor_hl(opt)
   local query = ts_highlight_query(opt.buf)
   if not query then
     return
@@ -22,12 +28,17 @@ local function ts_cursor_hl_match(type, opt)
   if not curnode then
     return
   end
-  for id, _, _ in query:iter_captures(curnode, opt.buf, 0, opt.lnum) do
+  local result = {}
+  local curword = word_before(opt)
+
+  for id, node, _ in query:iter_captures(curnode, opt.buf, 0, opt.lnum) do
     local name = query.captures[id]
-    if type == name then
-      return true
+    local text = treesitter.get_node_text(node, opt.buf)
+    if text == curword then
+      result[#result + 1] = name
     end
   end
+  return result
 end
 
 local function ts_node_match(type, word, opt)
@@ -57,14 +68,8 @@ local function ts_node_match(type, word, opt)
   end
 end
 
-local function word_before(opt)
-  local line = api.nvim_buf_get_text(opt.buf, opt.lnum - 1, 0, opt.lnum - 1, opt.col, {})[1]
-  local word = string.match(line:sub(1, opt.col), '%w+$') or nil
-  return word
-end
-
 return {
-  ts_cursor_hl_match = ts_cursor_hl_match,
+  ts_cursor_hl = ts_cursor_hl,
   ts_highlight_query = ts_highlight_query,
   ts_cursor_node = ts_cursor_node,
   ts_node_match = ts_node_match,

@@ -59,10 +59,20 @@ function ctx.rust_single_colon(opt)
   if not word then
     return
   end
-  if util.ts_cursor_hl_match('variable', opt) then
+  local it = vim.iter(util.ts_cursor_hl(opt))
+  local match = {}
+  it:map(function(item)
+    if item == 'variable' then
+      match.variable = true
+    end
+    if item == 'constant' then
+      match.constant = true
+    end
+  end)
+  if match.variable and not match.constant then
     return true
   end
-  if ctx.diagnostic_match('expected COLON') then
+  if ctx.diagnostic_match('expected COLON')(opt) then
     return true
   end
 end

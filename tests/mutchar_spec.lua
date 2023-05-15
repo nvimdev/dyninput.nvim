@@ -25,6 +25,10 @@ local t = function(s)
   return vim.api.nvim_replace_termcodes(s, true, true, true)
 end
 
+local feedkey = function(key)
+  vim.api.nvim_feedkeys(t('a' .. key), 'x', false)
+end
+
 local function join_paths(...)
   local path_sep = on_windows and '\\' or '/'
   local result = table.concat({ ... }, path_sep)
@@ -70,7 +74,7 @@ describe('mutchar', function()
     vim.bo[bufnr].filetype = 'cpp'
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'template' })
     vim.api.nvim_win_set_cursor(0, { 1, 8 })
-    vim.api.nvim_feedkeys(t('a,'), 'x', false)
+    feedkey(',')
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
     eq('template <>', line)
   end)
@@ -79,7 +83,7 @@ describe('mutchar', function()
     vim.bo.filetype = 'lua'
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'function self' })
     vim.api.nvim_win_set_cursor(0, { 1, 13 })
-    vim.api.nvim_feedkeys(t('a;'), 'x', false)
+    feedkey(';')
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
     eq('function self:', line)
   end)
@@ -98,7 +102,7 @@ describe('mutchar', function()
         message = 'undefined a',
       },
     })
-    vim.api.nvim_feedkeys(t('a;'), 'x', false)
+    feedkey(';')
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
     eq('g := ', line)
   end)
@@ -119,7 +123,7 @@ describe('mutchar', function()
         message = 'expected 1 expression',
       },
     })
-    vim.api.nvim_feedkeys(t('a;'), 'x', false)
+    feedkey(';')
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
     eq('g,t := ', line)
   end)
@@ -130,7 +134,7 @@ describe('mutchar', function()
       vim.bo.filetype = 'rust'
       vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'fn main () {', '    let s = String', '}' })
       vim.api.nvim_win_set_cursor(0, { 2, 18 })
-      vim.api.nvim_feedkeys(t('a;'), 'x', false)
+      feedkey(';')
       local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
       eq('    let s = String::', line)
     end)
@@ -146,7 +150,7 @@ describe('mutchar', function()
       )
       vim.cmd('TSBufEnable highlight')
       vim.api.nvim_win_set_cursor(0, { 3, 9 })
-      vim.api.nvim_feedkeys(t('a;'), 'x', false)
+      feedkey(';')
       local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[3]
       eq('    module::', line)
     end)
@@ -171,9 +175,33 @@ describe('mutchar', function()
       ]]
       )
       vim.api.nvim_win_set_cursor(0, { 3, 9 })
-      vim.api.nvim_feedkeys(t('a;'), 'x', false)
+      feedkey(';')
       local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[3]
       eq('    io::', line)
+    end)
+
+    it('rust_single_colon', function()
+      vim.bo.filetype = 'rust'
+      vim.api.nvim_buf_set_lines(
+        bufnr,
+        0,
+        -1,
+        false,
+        {
+          'enum Direction {',
+          '    Up,',
+          '    Down,',
+          '}',
+          'pub fn main() {',
+          '    let test = Direction::Up',
+          '}',
+        }
+      )
+      vim.cmd('TSBufEnable highlight')
+      vim.api.nvim_win_set_cursor(0, { 6, 28 })
+      feedkey(';')
+      local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[6]
+      eq('    let test = Direction::Up;', line)
     end)
 
     it('in struct with diagnsotic', function()
@@ -192,7 +220,7 @@ describe('mutchar', function()
           message = 'expected COLON',
         },
       })
-      vim.api.nvim_feedkeys(t('a;'), 'x', false)
+      feedkey(';')
       local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
       eq('    username: ', line)
     end)
