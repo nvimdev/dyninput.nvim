@@ -1,3 +1,4 @@
+local nvim_buf_get_text = vim.api.nvim_buf_get_text
 local util = require('mutchar.util')
 local ctx = {}
 
@@ -52,22 +53,32 @@ function ctx.semicolon_in_lua(opt)
 end
 
 function ctx.rust_match_arrow(opt)
-  local word = util.word_before(opt)
-  if not word or word:find('%d') then
-    return
+  local char = util.char_before(opt)
+  if char == ')' then
+    return true
   end
-  if not word then
-    return
+  local line = nvim_buf_get_text(opt.buf, opt.lnum - 1, 0, opt.lnum - 1, opt.col, {})[1]
+  if line:match('^%s+_$') then
+    return true
   end
   local res = util.ts_cursor_hl(opt)
   if not res then
     return
   end
-  local match = false
+  local match = {}
+  local target = { 'type', 'constant' }
   for _, item in ipairs(res) do
-    match = item.capture == 'variable' or item.capture == 'type' or item.capture == 'constant'
+    if vim.tbl_contains(target, item.capture) then
+      match[#match + 1] = true
+    end
   end
-  return match
+
+  if #match ~= 2 or #vim.tbl_filter(function(item)
+    return item == true
+  end, match) ~= 2 then
+    return false
+  end
+  return true
 end
 
 function ctx.rust_single_colon(opt)
@@ -102,7 +113,7 @@ function ctx.rust_double_colon(opt)
     return
   end
   --match builtin type
-  local list = { 'String', 'std' }
+  local list = { 'Option', 'String', 'std' }
   if vim.tbl_contains(list, word) then
     return true
   end
