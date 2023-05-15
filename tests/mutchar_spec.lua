@@ -18,7 +18,7 @@ mutchar.setup({
       { '::', ctx.rust_double_colon },
       { ': ', ctx.rust_single_colon },
     },
-    ['='] = {' => ', ctx.rust_match_arrow},
+    ['='] = { ' => ', ctx.rust_match_arrow },
   },
 })
 
@@ -234,7 +234,7 @@ describe('mutchar', function()
         '    }',
         '}',
       })
-      vim.treesitter.start(bufnr,'rust')
+      vim.treesitter.start(bufnr, 'rust')
       vim.api.nvim_win_set_cursor(0, { 8, 20 })
       feedkey('=')
       local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[8]
