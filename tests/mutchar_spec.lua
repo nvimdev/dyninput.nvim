@@ -182,21 +182,15 @@ describe('mutchar', function()
 
     it('rust_single_colon', function()
       vim.bo.filetype = 'rust'
-      vim.api.nvim_buf_set_lines(
-        bufnr,
-        0,
-        -1,
-        false,
-        {
-          'enum Direction {',
-          '    Up,',
-          '    Down,',
-          '}',
-          'pub fn main() {',
-          '    let test = Direction::Up',
-          '}',
-        }
-      )
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+        'enum Direction {',
+        '    Up,',
+        '    Down,',
+        '}',
+        'pub fn main() {',
+        '    let test = Direction::Up',
+        '}',
+      })
       vim.cmd('TSBufEnable highlight')
       vim.api.nvim_win_set_cursor(0, { 6, 28 })
       feedkey(';')
