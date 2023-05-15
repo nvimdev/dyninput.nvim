@@ -20,28 +20,11 @@ local function ts_cursor_node(buf)
 end
 
 local function ts_cursor_hl(opt)
-  local query = ts_highlight_query(opt.buf)
-  if not query then
-    return
-  end
-  local curnode = ts_cursor_node(opt.buf)
-  if not curnode then
-    return
-  end
-  local result = {}
-  local curword = word_before(opt)
-
-  for id, node, _ in query:iter_captures(curnode, opt.buf, 0, opt.lnum) do
-    local name = query.captures[id]
-    local text = treesitter.get_node_text(node, opt.buf)
-    if text == curword then
-      result[#result + 1] = name
-    end
-  end
-  return result
+  local res = vim.inspect_pos(opt.buf, opt.lnum - 1, opt.col - 1)
+  return res.treesitter
 end
 
-local function ts_node_match(type, word, opt)
+local function ts_hl_match(type, word, opt)
   local query = ts_highlight_query(opt.buf)
   if not query then
     return
@@ -72,6 +55,6 @@ return {
   ts_cursor_hl = ts_cursor_hl,
   ts_highlight_query = ts_highlight_query,
   ts_cursor_node = ts_cursor_node,
-  ts_node_match = ts_node_match,
+  ts_hl_match = ts_hl_match,
   word_before = word_before,
 }

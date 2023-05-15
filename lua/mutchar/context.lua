@@ -51,6 +51,25 @@ function ctx.semicolon_in_lua(opt)
   end
 end
 
+function ctx.rust_match_arrow(opt)
+  local word = util.word_before(opt)
+  if not word or word:find('%d') then
+    return
+  end
+  if not word then
+    return
+  end
+  local res = util.ts_cursor_hl(opt)
+  if not res then
+    return
+  end
+  local match = false
+  for _, item in ipairs(res) do
+    match = item.capture == 'variable' or item.capture == 'type' or item.capture == 'constant'
+  end
+  return match
+end
+
 function ctx.rust_single_colon(opt)
   local word = util.word_before(opt)
   if not word or word:find('%d') then
@@ -62,10 +81,10 @@ function ctx.rust_single_colon(opt)
   local it = vim.iter(util.ts_cursor_hl(opt))
   local match = {}
   it:map(function(item)
-    if item == 'variable' then
+    if item.capture == 'variable' then
       match.variable = true
     end
-    if item == 'constant' then
+    if item.capture == 'constant' then
       match.constant = true
     end
   end)
@@ -90,7 +109,7 @@ function ctx.rust_double_colon(opt)
 
   local type = { 'enum', 'namespace' }
   --match module/enum
-  if util.ts_node_match(type, word, opt) then
+  if util.ts_hl_match(type, word, opt) then
     return true
   end
 end

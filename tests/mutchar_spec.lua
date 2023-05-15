@@ -18,6 +18,7 @@ mutchar.setup({
       { '::', ctx.rust_double_colon },
       { ': ', ctx.rust_single_colon },
     },
+    ['='] = {' => ', ctx.rust_match_arrow},
   },
 })
 
@@ -132,6 +133,7 @@ describe('mutchar', function()
   describe('in rust with rust_double_colon', function()
     it('after String keyword', function()
       vim.bo.filetype = 'rust'
+      vim.treesitter.start(bufnr, 'rust')
       vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'fn main () {', '    let s = String', '}' })
       vim.api.nvim_win_set_cursor(0, { 2, 18 })
       feedkey(';')
@@ -191,7 +193,6 @@ describe('mutchar', function()
         '    let test = Direction::Up',
         '}',
       })
-      vim.cmd('TSBufEnable highlight')
       vim.api.nvim_win_set_cursor(0, { 6, 28 })
       feedkey(';')
       local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[6]
@@ -200,7 +201,7 @@ describe('mutchar', function()
 
     it('in struct with diagnsotic', function()
       vim.bo.filetype = 'rust'
-      vim.cmd('TSBufDisable highlight')
+      vim.treesitter.start(bufnr, 'rust')
       vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'struct Test {', '    username', '}' })
       vim.api.nvim_win_set_cursor(0, { 2, 11 })
       vim.diagnostic.set(ns, bufnr, {
@@ -217,6 +218,27 @@ describe('mutchar', function()
       feedkey(';')
       local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
       eq('    username: ', line)
+    end)
+
+    it('rust match arrow symbol', function()
+      vim.bo.filetype = 'rust'
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+        'enum Direction {',
+        '    Up,',
+        '    Down,',
+        '}',
+        'pub fn main() {',
+        '    let test = Direction::Up;',
+        '    match test {',
+        '        Direction::Up',
+        '    }',
+        '}',
+      })
+      vim.treesitter.start(bufnr,'rust')
+      vim.api.nvim_win_set_cursor(0, { 8, 20 })
+      feedkey('=')
+      local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[8]
+      -- eq('        Direction::Up => ',line)
     end)
   end)
 end)
