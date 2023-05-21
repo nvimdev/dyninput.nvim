@@ -6,6 +6,21 @@ local function flush_new(opt, new)
   api.nvim_win_set_cursor(0, { opt.lnum, opt.col + #new })
 end
 
+local function has_rule(rules, opt)
+  local chars = vim
+    .iter(rules)
+    :map(function(item)
+      return item[1]
+    end)
+    :totable()
+  local line = api.nvim_buf_get_text(opt.buf, opt.lnum - 1, 0, opt.lnum - 1, opt.col, {})[1]
+  for _, char in ipairs(chars) do
+    if line:sub(#line - #char + 1, #line) == char then
+      return char
+    end
+  end
+end
+
 local function buf_map(buf, item)
   local mut, mut_rules = unpack(item)
 
@@ -18,6 +33,18 @@ local function buf_map(buf, item)
       }
       opt.lnum, opt.col = unpack(api.nvim_win_get_cursor(0))
       local rules = type(mut_rules[1]) == 'table' and mut_rules or { mut_rules }
+      local char = has_rule(rules, opt)
+      if char then
+        api.nvim_buf_set_text(
+          opt.buf,
+          opt.lnum - 1,
+          opt.col - #char,
+          opt.lnum - 1,
+          opt.col,
+          { mut }
+        )
+        return
+      end
 
       for _, rule in ipairs(rules) do
         local new, filter = unpack(rule)

@@ -30,6 +30,18 @@ local function ts_cursor_hl(opt)
   return res.treesitter
 end
 
+local function ts_parent_node_type(opt)
+  local curnode = ts_cursor_node(opt.buf)
+  if not curnode then
+    return
+  end
+  local parent = curnode:parent()
+  if not parent then
+    return
+  end
+  return parent:type()
+end
+
 local function ts_hl_match(type, word, opt)
   local query = ts_highlight_query(opt.buf)
   if not query then
@@ -58,6 +70,7 @@ local function ts_hl_match(type, word, opt)
 end
 
 return {
+  ts_parent_node_type = ts_parent_node_type,
   ts_cursor_hl = ts_cursor_hl,
   ts_highlight_query = ts_highlight_query,
   ts_cursor_node = ts_cursor_node,
