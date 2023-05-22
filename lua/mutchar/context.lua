@@ -1,5 +1,4 @@
 local api = vim.api
-local nvim_buf_get_text = vim.api.nvim_buf_get_text
 local util = require('mutchar.util')
 local ctx = {}
 
@@ -84,8 +83,8 @@ function ctx.rust_double_colon(opt)
   if not word then
     return
   end
-  --match builtin type
-  local list = { 'Option', 'String', 'std' }
+
+  local list = { 'Option', 'String', 'std', 'super' }
   if vim.tbl_contains(list, word) then
     return true
   end

@@ -2,8 +2,8 @@ local treesitter, api = vim.treesitter, vim.api
 
 local function word_before(opt)
   local line = api.nvim_buf_get_text(opt.buf, opt.lnum - 1, 0, opt.lnum - 1, opt.col, {})[1]
-  local word = string.match(line:sub(1, opt.col), '%w+$') or nil
-  return word
+  local res = vim.split(line, '%s')
+  return res[#res]
 end
 
 local function char_before(opt)
