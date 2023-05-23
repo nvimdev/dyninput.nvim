@@ -98,7 +98,7 @@ end
 
 function ctx.rust_thin_arrow()
   local line = api.nvim_get_current_line()
-  if line:find('%s*[pub]*%sfn') then
+  if line:find('^%s*[pub%s*]*fn') then
     return true
   end
 end
