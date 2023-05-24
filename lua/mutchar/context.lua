@@ -104,7 +104,10 @@ function ctx.rust_thin_arrow()
 end
 
 function ctx.rust_fat_arrow(opt)
-  if util.ts_parent_node_type(opt) ~= 'match_expression' then
+  if
+    util.ts_parent_node_type(opt) ~= 'match_expression'
+    and util.ts_cursor_node(opt.buf):type() ~= 'ERROR'
+  then
     return
   end
   return true
