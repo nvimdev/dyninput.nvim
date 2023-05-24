@@ -19,6 +19,7 @@ mutchar.setup({
       { ': ', ctx.rust_single_colon },
     },
     ['='] = { ' => ', ctx.rust_fat_arrow },
+    ['-'] = { ' -> ', ctx.rust_thin_arrow },
   },
 })
 
@@ -166,7 +167,7 @@ describe('mutchar', function()
         false,
         { 'use std::io;', 'fn main(){', '    io', '}' }
       )
-      vim.cmd('TSBufEnable highlight')
+      vim.treesitter.start(bufnr, 'rust')
       vim.treesitter.query.set(
         'rust',
         'highlights',
@@ -238,7 +239,34 @@ describe('mutchar', function()
       vim.api.nvim_win_set_cursor(0, { 8, 20 })
       feedkey('=')
       local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[8]
-      eq('        Direction::Up => ',line)
+      eq('        Direction::Up => ', line)
+    end)
+
+    it('rust thin arrow', function()
+      vim.bo.filetype = 'rust'
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+        'fn test()',
+      })
+      vim.api.nvim_win_set_cursor(0, { 1, 9 })
+      feedkey('-')
+      local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
+      eq('fn test() -> ', line)
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+        'pub fn test()',
+      })
+      vim.api.nvim_win_set_cursor(0, { 1, 13 })
+      feedkey('-')
+      line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
+      eq('pub fn test() -> ', line)
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+        'fn main() {',
+        '    fn inline()',
+        '}',
+      })
+      vim.api.nvim_win_set_cursor(0, { 2, 16 })
+      feedkey('-')
+      line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
+      eq('    fn inline() -> ', line)
     end)
   end)
 end)
