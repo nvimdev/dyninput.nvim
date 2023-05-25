@@ -53,24 +53,12 @@ function ctx.semicolon_in_lua(opt)
 end
 
 function ctx.rust_single_colon(opt)
-  local word = util.word_before(opt)
-  if not word or word:find('%d') then
-    return
+  local line = api.nvim_get_current_line()
+  if line:find('%s*use$%s*') then
+    return false
   end
-  if not word then
-    return
-  end
-  local it = vim.iter(util.ts_cursor_hl(opt))
-  local match = {}
-  it:map(function(item)
-    if item.capture == 'variable' then
-      match.variable = true
-    end
-    if item.capture == 'constant' then
-      match.constant = true
-    end
-  end)
-  if match.variable and not match.constant then
+  local parent = util.ts_parent_node_type(opt)
+  if parent == 'struct_item' then
     return true
   end
   if ctx.diagnostic_match('expected COLON')(opt) then

@@ -198,6 +198,11 @@ describe('mutchar', function()
       feedkey(';')
       local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[6]
       eq('    let test = Direction::Up;', line)
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {'use std::io'})
+      vim.api.nvim_win_set_cursor(0, { 1, 10 })
+      feedkey(';')
+      line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
+      eq('use std::io;', line)
     end)
 
     it('in struct with diagnsotic', function()
