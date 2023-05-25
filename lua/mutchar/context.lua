@@ -61,9 +61,6 @@ function ctx.rust_single_colon(opt)
   if parent == 'struct_item' then
     return true
   end
-  if ctx.diagnostic_match('expected COLON')(opt) then
-    return true
-  end
 end
 
 function ctx.rust_double_colon(opt)
