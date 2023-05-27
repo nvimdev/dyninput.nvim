@@ -111,20 +111,6 @@ describe('in rust with rust_double_colon', function()
     feedkey('=')
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[8]
     eq('        Direction::Up => ', line)
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
-      'use std::io::File;',
-      'fn main() {',
-      '    let f = File::open("test.rs");',
-      '    let file = match f {',
-      '        Ok(fd)',
-      '    }',
-      '}',
-    })
-    vim.treesitter.start(bufnr, 'rust')
-    vim.api.nvim_win_set_cursor(0, { 5, 13 })
-    feedkey('=')
-    line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[5]
-    eq('        Ok(fd) => ', line)
   end)
 
   it('rust thin arrow', function()

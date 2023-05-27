@@ -58,7 +58,11 @@ function ctx.rust_single_colon(opt)
     return false
   end
   local parent = util.ts_parent_node_type(opt)
-  if parent == 'struct_item' then
+  if parent == 'let_declaration' then
+    return true
+  end
+  local scope = util.ts_blank_node_parent(opt.buf)
+  if scope == 'struct_item' then
     return true
   end
 end
@@ -89,10 +93,9 @@ function ctx.rust_thin_arrow()
 end
 
 function ctx.rust_fat_arrow(opt)
-  if
-    util.ts_parent_node_type(opt) ~= 'match_expression'
-    and util.ts_cursor_node(opt.buf):type() ~= 'ERROR'
-  then
+  local type = util.ts_blank_node_parent(opt.buf)
+  print(type)
+  if type ~= 'match_block' and type ~= 'match_expression' and type ~= 'ERROR' then
     return
   end
   return true

@@ -20,8 +20,8 @@ local function ts_highlight_query(buf)
   return treesitter.query.get(lang, 'highlights')
 end
 
-local function ts_cursor_node(buf)
-  local curnode = treesitter.get_node({ bufnr = buf })
+local function ts_cursor_node(opt)
+  local curnode = treesitter.get_node({ bufnr = opt.buf, pos = { opt.lnum - 1, opt.col - 1 } })
   return curnode
 end
 
@@ -31,11 +31,23 @@ local function ts_cursor_hl(opt)
 end
 
 local function ts_parent_node_type(opt)
-  local curnode = ts_cursor_node(opt.buf)
+  local curnode = ts_cursor_node(opt)
   if not curnode then
     return
   end
   local parent = curnode:parent()
+  if not parent then
+    return
+  end
+  return parent:type()
+end
+
+local function ts_blank_node_parent(buf)
+  local blank = treesitter.get_node({ bufnr = buf })
+  if not blank then
+    return
+  end
+  local parent = blank:parent()
   if not parent then
     return
   end
@@ -47,7 +59,7 @@ local function ts_hl_match(type, word, opt)
   if not query then
     return
   end
-  local curnode = ts_cursor_node(opt.buf)
+  local curnode = ts_cursor_node(opt)
   if not curnode then
     return
   end
@@ -74,6 +86,7 @@ return {
   ts_cursor_hl = ts_cursor_hl,
   ts_highlight_query = ts_highlight_query,
   ts_cursor_node = ts_cursor_node,
+  ts_blank_node_parent = ts_blank_node_parent,
   ts_hl_match = ts_hl_match,
   word_before = word_before,
   char_before = char_before,
