@@ -75,7 +75,7 @@ local function create_event(ft, config)
   end
 
   api.nvim_create_autocmd('FileType', {
-    group = api.nvim_create_augroup('MutChar', { clear = false }),
+    group = api.nvim_create_augroup('Dynchar', { clear = false }),
     pattern = ft,
     callback = function(arg)
       vim.iter(tuples):map(function(item)

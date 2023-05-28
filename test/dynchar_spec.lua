@@ -1,8 +1,8 @@
 local helper = require('test.helper')
 local feedkey = helper.feedkey
-local mutchar = require('mutchar')
-local ctx = require('mutchar.context')
-local ns = vim.api.nvim_create_namespace('mutchar')
+local mutchar = require('dynchar')
+local ctx = require('dynchar.context')
+local ns = vim.api.nvim_create_namespace('dynchar')
 local eq = assert.equal
 
 mutchar.setup({

@@ -24,7 +24,7 @@ describe('in rust with rust_double_colon', function()
       '    let s = (String)',
       '}',
     })
-    vim.api.nvim_win_set_cursor(0, {2, 18})
+    vim.api.nvim_win_set_cursor(0, { 2, 18 })
     feedkey(';')
     line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
     eq('    let s = (String::)', line)

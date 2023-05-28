@@ -1,5 +1,5 @@
 local api = vim.api
-local util = require('mutchar.util')
+local util = require('dynchar.util')
 local ctx = {}
 
 local function factory(fn)
