@@ -1,6 +1,6 @@
-# MutChar.nvim
+# dynchar.nvim
 
-change the input character according the context need neovim 0.10+
+Dynamisc change the type character according the context need neovim 0.10+
 
 Note: In develope may breakchange any time
 
@@ -12,9 +12,9 @@ must neovim 0.10+(head) version
 
 ```lua
 require('lazy').setup({
-    'nvimdev/mutchar.nvim',
+    'nvimdev/dynchar.nvim',
     config = function()
-        require('mutchar').setup(conf)
+        require('dynchar').setup(conf)
     end,
 })
 ```
@@ -24,8 +24,8 @@ require('lazy').setup({
 rule in setup config table. example config
 
 ```lua
-local ctx = require('mutchar.context')
-require('mutchar').setup({
+local ctx = require('dynchar.context')
+require('dynchar').setup({
   go = {
     [';'] =  {':= ', ctx.diagnostic_match({'undefine','expression'}) },
   },
