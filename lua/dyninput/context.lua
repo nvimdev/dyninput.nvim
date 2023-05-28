@@ -74,7 +74,7 @@ function ctx.rust_double_colon(opt)
     return
   end
 
-  local list = { 'Option', 'String', 'std', 'super' }
+  local list = { 'Option', 'String', 'std', 'super', 'Vec' }
   if vim.tbl_contains(list, word) then
     return true
   end
