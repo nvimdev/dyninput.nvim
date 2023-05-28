@@ -3,20 +3,20 @@
 ==============================================================================
 Table of Contents                             *mutchar.nvim-table-of-contents*
 
-1. dynchar.nvim                                    |mutchar.nvim-dynchar.nvim|
-  - Install                                |mutchar.nvim-dynchar.nvim-install|
-  - Config                                  |mutchar.nvim-dynchar.nvim-config|
-  - Default Context Provider|mutchar.nvim-dynchar.nvim-default-context-provider|
+1. dyninput.nvim                                  |mutchar.nvim-dyninput.nvim|
+  - Install                               |mutchar.nvim-dyninput.nvim-install|
+  - Config                                 |mutchar.nvim-dyninput.nvim-config|
+  - Default Context Provider|mutchar.nvim-dyninput.nvim-default-context-provider|
 
 ==============================================================================
-1. dynchar.nvim                                    *mutchar.nvim-dynchar.nvim*
+1. dyninput.nvim                                  *mutchar.nvim-dyninput.nvim*
 
-Dynamisc change the type character according the context need neovim 0.10+
+Dynamisc change the input according the context need neovim 0.10+
 
 Note: In develope may breakchange any time
 
 
-INSTALL                                    *mutchar.nvim-dynchar.nvim-install*
+INSTALL                                   *mutchar.nvim-dyninput.nvim-install*
 
 must neovim 0.10+(head) version
 
@@ -24,21 +24,21 @@ must neovim 0.10+(head) version
 
 >lua
     require('lazy').setup({
-        'nvimdev/dynchar.nvim',
+        'nvimdev/dyninput.nvim',
         config = function()
-            require('dynchar').setup(conf)
+            require('dyninput').setup(conf)
         end,
     })
 <
 
 
-CONFIG                                      *mutchar.nvim-dynchar.nvim-config*
+CONFIG                                     *mutchar.nvim-dyninput.nvim-config*
 
 rule in setup config table. example config
 
 >lua
-    local ctx = require('dynchar.context')
-    require('dynchar').setup({
+    local ctx = require('dyninput.context')
+    require('dyninput').setup({
       go = {
         [';'] =  {':= ', ctx.diagnostic_match({'undefine','expression'}) },
       },
@@ -50,7 +50,7 @@ rule in setup config table. example config
 <
 
 
-DEFAULT CONTEXT PROVIDER  *mutchar.nvim-dynchar.nvim-default-context-provider*
+DEFAULT CONTEXT PROVIDER *mutchar.nvim-dyninput.nvim-default-context-provider*
 
 >
     ctx.non_space_before -- check before has space or not
