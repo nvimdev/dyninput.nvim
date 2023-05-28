@@ -57,12 +57,13 @@ function ctx.rust_single_colon(opt)
   if line:find('%s*use$%s*') then
     return false
   end
+  local curnode = util.ts_cursor_node(opt)
   local parent = util.ts_parent_node_type(opt)
-  if parent == 'let_declaration' then
+  if parent == 'let_declaration' and curnode and curnode:type() == 'identifier' then
     return true
   end
   local scope = util.ts_blank_node_parent(opt.buf)
-  if scope == 'struct_item' then
+  if scope == 'struct_item' or scope == 'struct_expression' then
     return true
   end
 end
@@ -76,6 +77,12 @@ function ctx.rust_double_colon(opt)
   local list = { 'Option', 'String', 'std', 'super' }
   if vim.tbl_contains(list, word) then
     return true
+  end
+
+  for _, item in ipairs(list) do
+    if word:sub(#word - #item + 1, #word) == item then
+      return true
+    end
   end
 
   local type = { 'enum', 'namespace' }

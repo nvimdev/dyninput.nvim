@@ -19,6 +19,15 @@ describe('in rust with rust_double_colon', function()
     feedkey(';')
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
     eq('    let s = String::', line)
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+      'fn main(){',
+      '    let s = (String)',
+      '}',
+    })
+    vim.api.nvim_win_set_cursor(0, {2, 18})
+    feedkey(';')
+    line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
+    eq('    let s = (String::)', line)
   end)
 
   it('after module', function()
