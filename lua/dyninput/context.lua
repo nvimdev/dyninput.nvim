@@ -59,7 +59,10 @@ function ctx.rust_single_colon(opt)
   end
   local curnode = util.ts_cursor_node(opt)
   local parent = util.ts_parent_node_type(opt)
-  if parent == 'let_declaration' and curnode and curnode:type() == 'identifier' then
+  if
+    (parent == 'let_declaration' and curnode and curnode:type() == 'identifier')
+    or parent == 'parameters'
+  then
     return true
   end
   local scope = util.ts_blank_node_parent(opt.buf)
@@ -107,7 +110,7 @@ function ctx.rust_fat_arrow(opt)
 end
 
 function ctx.generic_in_cpp()
-  local text = vim.api.nvim_get_current_line()
+  local text = api.nvim_get_current_line()
   if text == 'template' then
     return true
   end
