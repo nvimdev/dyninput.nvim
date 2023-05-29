@@ -75,14 +75,13 @@ function ctx.rust_double_colon(opt)
   end
 
   local list = { 'Option', 'String', 'std', 'super', 'Vec' }
-  if vim.tbl_contains(list, word) then
-    return true
-  end
-
   for _, item in ipairs(list) do
-    if word:sub(#word - #item + 1, #word) == item then
+    if word == item or word:sub(#word - #item + 1, #word) == item then
       return true
     end
+  end
+  if util.ts_parent_node_type(opt) == 'generic_function' then
+    return true
   end
 
   local type = { 'enum', 'namespace' }
@@ -101,7 +100,6 @@ end
 
 function ctx.rust_fat_arrow(opt)
   local type = util.ts_blank_node_parent(opt.buf)
-  print(type)
   if type ~= 'match_block' and type ~= 'match_expression' and type ~= 'ERROR' then
     return
   end
