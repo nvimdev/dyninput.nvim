@@ -62,6 +62,8 @@ function ctx.rust_single_colon(opt)
   if
     (parent == 'let_declaration' and curnode and curnode:type() == 'identifier')
     or parent == 'parameters'
+    --match in `where` trait bound
+    or parent == 'ERROR'
   then
     return true
   end
@@ -72,10 +74,9 @@ function ctx.rust_single_colon(opt)
 end
 
 function ctx.rust_double_colon(opt)
-  local word = util.word_before(opt)
-  if not word then
-    return
-  end
+  local line = api.nvim_buf_get_text(opt.buf, opt.lnum - 1, 0, opt.lnum - 1, opt.col, {})[1]
+  local part = vim.split(line, '%s')
+  local word = part[#part]
 
   local list = { 'Option', 'String', 'std', 'super', 'Vec' }
   for _, item in ipairs(list) do

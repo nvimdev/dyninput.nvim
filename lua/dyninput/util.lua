@@ -1,16 +1,4 @@
-local treesitter, api = vim.treesitter, vim.api
-
-local function word_before(opt)
-  local line = api.nvim_buf_get_text(opt.buf, opt.lnum - 1, 0, opt.lnum - 1, opt.col, {})[1]
-  local res = vim.split(line, '%s')
-  return res[#res]
-end
-
-local function char_before(opt)
-  local char =
-    api.nvim_buf_get_text(opt.buf, opt.lnum - 1, opt.col - 1, opt.lnum - 1, opt.col, {})[1]
-  return char
-end
+local treesitter = vim.treesitter
 
 local function ts_highlight_query(buf)
   local lang = treesitter.language.get_lang(vim.bo[buf].filetype)
@@ -88,6 +76,4 @@ return {
   ts_cursor_node = ts_cursor_node,
   ts_blank_node_parent = ts_blank_node_parent,
   ts_hl_match = ts_hl_match,
-  word_before = word_before,
-  char_before = char_before,
 }

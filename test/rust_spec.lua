@@ -15,7 +15,7 @@ describe('in rust with rust_double_colon', function()
     vim.bo.filetype = 'rust'
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'fn main () {', '    let s = String', '}' })
     vim.api.nvim_win_set_cursor(0, { 2, 18 })
-    vim.cmd("TSBufEnable highlight")
+    vim.cmd('TSBufEnable highlight')
     feedkey(';')
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
     eq('    let s = String::', line)
@@ -29,12 +29,12 @@ describe('in rust with rust_double_colon', function()
     line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
     eq('    let s = (String::)', line)
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
-      "fn main(){",
-      "    let v = Vec",
-      "}",
+      'fn main(){',
+      '    let v = Vec',
+      '}',
     })
-    vim.api.nvim_win_set_cursor(0, { 2, 14})
-    vim.cmd("TSBufEnable highlight")
+    vim.api.nvim_win_set_cursor(0, { 2, 14 })
+    vim.cmd('TSBufEnable highlight')
     feedkey(';')
     line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
     eq('    let v = Vec::', line)
@@ -43,16 +43,16 @@ describe('in rust with rust_double_colon', function()
   it('after generic', function()
     vim.bo[bufnr].filetype = 'rust'
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
-      "use std::collections::HashMap",
-      "fn main(){",
-      "    let v = HashMap::<i32, i32>",
-      "}",
+      'use std::collections::HashMap',
+      'fn main(){',
+      '    let v = HashMap::<i32, i32>',
+      '}',
     })
-    vim.cmd("TSBufEnable highlight")
+    vim.cmd('TSBufEnable highlight')
     vim.api.nvim_win_set_cursor(0, { 3, 32 })
     feedkey(';')
     line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[3]
-    eq("    let v = HashMap::<i32, i32>::", line)
+    eq('    let v = HashMap::<i32, i32>::', line)
   end)
 
   it('after module', function()
@@ -110,6 +110,16 @@ describe('in rust with rust_double_colon', function()
     feedkey(';')
     line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
     eq('use std::io;', line)
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+      'ust std::fmt::Display',
+      'fn longest<T, U>(x: T, y:U) -> T',
+      'where T',
+    })
+    vim.cmd('TSBufEnable highlight')
+    vim.api.nvim_win_set_cursor(0, { 3, 7 })
+    feedkey(';Display, U;Display')
+    line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[3]
+    eq('where T: Display, U: Display', line)
   end)
 
   it('in struct', function()
