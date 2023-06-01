@@ -11,10 +11,14 @@ local function join_paths(...)
   return result
 end
 
-local function treesitter_dep()
+local function test_dir()
   local data_path = vim.fn.stdpath('data')
-
   local package_root = join_paths(data_path, 'test')
+  return os.getenv('DYNTEST') or package_root
+end
+
+local function treesitter_dep()
+  local package_root = test_dir()
   local treesitter_path = join_paths(package_root, 'nvim-treesitter')
 
   vim.opt.runtimepath:append(treesitter_path)
