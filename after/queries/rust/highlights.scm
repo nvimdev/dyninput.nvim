@@ -6,3 +6,6 @@
 (use_declaration
   (scoped_identifier
     name: (identifier) @namespace))
+
+(use_declaration
+    (identifier) @namespace)

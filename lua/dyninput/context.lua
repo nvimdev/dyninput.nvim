@@ -62,8 +62,6 @@ function ctx.rust_single_colon(opt)
   if
     (parent == 'let_declaration' and curnode and curnode:type() == 'identifier')
     or parent == 'parameters'
-    --match in `where` trait bound
-    or parent == 'ERROR'
   then
     return true
   end
@@ -84,6 +82,7 @@ function ctx.rust_double_colon(opt)
       return true
     end
   end
+
   if util.ts_parent_node_type(opt) == 'generic_function' then
     return true
   end
