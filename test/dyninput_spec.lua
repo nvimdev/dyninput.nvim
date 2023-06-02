@@ -22,6 +22,7 @@ mutchar.setup({
     },
     ['='] = { ' => ', ctx.rust_fat_arrow },
     ['-'] = { ' -> ', ctx.rust_thin_arrow },
+    ['|'] = { '|!| {}', ctx.rust_closure },
   },
 })
 

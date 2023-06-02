@@ -203,4 +203,18 @@ describe('rust file', function()
     line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
     eq('    fn inline() -> ', line)
   end)
+
+  it('rust closure symbol', function()
+    vim.bo[bufnr].filetype = 'rust'
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+      'fn main() {',
+      '    let test = fs::read_to_string("foo/bar").unwrap_or_else()',
+      '}',
+    })
+    vim.cmd("TSBufEnable highlight")
+    vim.api.nvim_win_set_cursor(0, { 2, 59})
+    feedkey('|')
+    local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1,false)[2]
+    eq('    let test = fs::read_to_string("foo/bar").unwrap_or_else(|| {})',line)
+  end)
 end)

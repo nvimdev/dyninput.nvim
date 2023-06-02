@@ -87,7 +87,7 @@ function ctx.rust_double_colon(opt)
     return true
   end
 
-  local type = { 'enum', 'namespace' }
+  local type = { 'enum', 'namespace', 'type' }
   --match module/enum
   if util.ts_hl_match(type, word, opt) then
     return true
@@ -97,6 +97,13 @@ end
 function ctx.rust_thin_arrow()
   local line = api.nvim_get_current_line()
   if line:find('^%s*[pub%s*]*fn') then
+    return true
+  end
+end
+
+function ctx.rust_closure(opt)
+  local curnode = util.ts_cursor_node(opt)
+  if curnode and curnode:type() == 'arguments' then
     return true
   end
 end
