@@ -49,8 +49,9 @@ function rs.double_colon(opt)
   --for normal generic type is a Upper letter like T/U
   --so check has type and before word not a upper letter
   local type = { 'enum', 'namespace', 'type' }
+  local parent = util.ts_parent_node_type(opt)
   --match module/enum
-  if util.ts_hl_match(type, word, opt) and not word:match('^[A-Z]$') then
+  if util.ts_hl_match(type, word, opt) and not word:match('^[A-Z]$') and parent ~= 'parameters' then
     return true
   end
 end
