@@ -138,8 +138,7 @@ describe('rust file', function()
     vim.api.nvim_win_set_cursor(0, { 3, 7 })
     feedkey(';Display, U;Display')
     line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[3]
-    --TODO: improve where section
-    -- eq('where T: Display, U: Display', line)
+    eq('where T: Display, U: Display', line)
   end)
 
   it('in struct', function()
@@ -213,7 +212,7 @@ describe('rust file', function()
     })
     vim.cmd('TSBufEnable highlight')
     vim.api.nvim_win_set_cursor(0, { 2, 59 })
-    feedkey('|')
+    feedkey('\\')
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
     eq('    let test = fs::read_to_string("foo/bar").unwrap_or_else(|| {})', line)
   end)

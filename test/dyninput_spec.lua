@@ -20,7 +20,7 @@ require('dyninput').setup({
     },
     ['='] = { ' => ', rs.fat_arrow },
     ['-'] = { ' -> ', rs.thin_arrow },
-    ['|'] = { '|!| {}', rs.closure_fn },
+    ['\\'] = { '|!| {}', rs.closure_fn },
   },
   lua = {
     [';'] = { ':', ms.semicolon_in_lua },

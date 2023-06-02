@@ -19,6 +19,14 @@ function rs.single_colon(opt)
   if scope == 'struct_item' or scope == 'struct_expression' then
     return true
   end
+  --assume generic type is always upper letter
+  --work for where expression in newline like
+  --where T:Foo, U:Bar
+  local part = vim.split(line, '%s')
+  local word = part[#part]
+  if line:find('^where') and word:match('^[A-Z]$') then
+    return true
+  end
 end
 
 function rs.double_colon(opt)
@@ -37,9 +45,12 @@ function rs.double_colon(opt)
     return true
   end
 
+  --type: for match struct::foo
+  --for normal generic type is a Upper letter like T/U
+  --so check has type and before word not a upper letter
   local type = { 'enum', 'namespace', 'type' }
   --match module/enum
-  if util.ts_hl_match(type, word, opt) then
+  if util.ts_hl_match(type, word, opt) and not word:match('^[A-Z]$') then
     return true
   end
 end
