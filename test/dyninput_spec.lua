@@ -1,32 +1,40 @@
 local helper = require('test.helper')
 local feedkey = helper.feedkey
-local mutchar = require('dyninput')
-local ctx = require('dyninput.context')
 local ns = vim.api.nvim_create_namespace('dyninput')
 local eq = assert.equal
 
-mutchar.setup({
+local rs = require('dyninput.lang.rust')
+local ms = require('dyninput.lang.misc')
+require('dyninput').setup({
+  c = {
+    ['-'] = { '->', ms.c_struct_pointer },
+  },
   cpp = {
-    [','] = { ' <!>', ctx.generic_in_cpp },
-  },
-  lua = {
-    [';'] = { ':', ctx.semicolon_in_lua },
-  },
-  go = {
-    [';'] = { ' := ', ctx.diagnostic_match({ 'undefine', 'expression' }) },
+    [','] = { ' <!>', ms.generic_in_cpp },
+    ['-'] = { '->', ms.c_struct_pointer },
   },
   rust = {
     [';'] = {
-      { '::', ctx.rust_double_colon },
-      { ': ', ctx.rust_single_colon },
+      { '::', rs.double_colon },
+      { ': ', rs.single_colon },
     },
-    ['='] = { ' => ', ctx.rust_fat_arrow },
-    ['-'] = { ' -> ', ctx.rust_thin_arrow },
-    ['|'] = { '|!| {}', ctx.rust_closure },
+    ['='] = { ' => ', rs.fat_arrow },
+    ['-'] = { ' -> ', rs.thin_arrow },
+    ['|'] = { '|!| {}', rs.closure_fn },
+  },
+  lua = {
+    [';'] = { ':', ms.semicolon_in_lua },
+  },
+  go = {
+    [';'] = {
+      { ' := ', ms.go_variable_define },
+      { ': ', ms.go_struct_field },
+    },
   },
 })
 
-describe('mutchar', function()
+describe('dyninput should work as expect', function()
+  helper.treesitter_dep()
   local bufnr
   before_each(function()
     bufnr = vim.api.nvim_create_buf(true, true)
@@ -51,43 +59,50 @@ describe('mutchar', function()
     eq('function self:', line)
   end)
 
-  it('single variable define in go', function()
+  it('go test', function()
     vim.bo.filetype = 'go'
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'g' })
-    vim.diagnostic.set(ns, bufnr, {
-      {
-        bufnr = bufnr,
-        lnum = 0,
-        end_lnum = 1,
-        col = 1,
-        end_col = 1,
-        severity = 1,
-        message = 'undefined a',
-      },
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+      'func main() {',
+      '    g',
+      '}',
     })
+    vim.api.nvim_win_set_cursor(0, { 2, 5 })
+    vim.cmd('TSBufEnable highlight')
     feedkey(';')
-    local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
-    eq('g := ', line)
+    local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
+    eq('    g := ', line)
   end)
 
-  it('multiple variable define in go', function()
-    vim.bo.filetype = 'go'
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'g,t' })
-    vim.api.nvim_win_set_cursor(0, { 1, 3 })
-    local ns = vim.api.nvim_create_namespace('mutchar')
-    vim.diagnostic.set(ns, bufnr, {
-      {
-        bufnr = bufnr,
-        lnum = 0,
-        end_lnum = 1,
-        col = 1,
-        end_col = 1,
-        severity = 1,
-        message = 'expected 1 expression',
-      },
+  it('go mulitple variable define', function()
+    vim.bo[bufnr].filetype = 'go'
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+      'func main() {',
+      '    a,b',
+      '}',
     })
+    vim.cmd('TSBufEnable highlight')
+    vim.api.nvim_win_set_cursor(0, { 2, 6 })
     feedkey(';')
-    local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
-    eq('g,t := ', line)
+    local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
+    eq('    a,b := ', line)
+  end)
+
+  it('go strcut field', function()
+    vim.bo[bufnr].filetype = 'go'
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+      'type Person struct {',
+      '    name string',
+      '}',
+      'func main() {',
+      '    t := Person {',
+      '        name',
+      '    }',
+      '}',
+    })
+    vim.cmd('TSBufEnable highlight')
+    vim.api.nvim_win_set_cursor(0, { 6, 12 })
+    feedkey(';')
+    local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[6]
+    eq('        name: ', line)
   end)
 end)

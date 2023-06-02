@@ -20,6 +20,7 @@ end
 local function treesitter_dep()
   local package_root = test_dir()
   local treesitter_path = join_paths(package_root, 'nvim-treesitter')
+  print(treesitter_path)
 
   vim.opt.runtimepath:append(treesitter_path)
   if vim.fn.isdirectory(treesitter_path) ~= 1 then
@@ -39,6 +40,7 @@ local function treesitter_dep()
   })
   if vim.fn.filereadable(join_paths(parser_dir, 'rust.so')) == 0 then
     vim.cmd('TSInstallSync rust')
+    vim.cmd('TSInstallSync go')
   end
 end
 

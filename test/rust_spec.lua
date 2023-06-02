@@ -96,16 +96,16 @@ describe('rust file', function()
             (identifier) @namespace)
       ]]
     )
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1,false, {
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
       'use rand;',
       'fn main(){',
       '    rand',
       '}',
     })
     vim.cmd('TSBufEnable highlight')
-    vim.api.nvim_win_set_cursor(0, { 3,8})
+    vim.api.nvim_win_set_cursor(0, { 3, 8 })
     feedkey(';')
-    line = vim.api.nvim_buf_get_lines(bufnr,0, -1, false)[3]
+    line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[3]
     eq('    rand::', line)
   end)
 
@@ -211,10 +211,10 @@ describe('rust file', function()
       '    let test = fs::read_to_string("foo/bar").unwrap_or_else()',
       '}',
     })
-    vim.cmd("TSBufEnable highlight")
-    vim.api.nvim_win_set_cursor(0, { 2, 59})
+    vim.cmd('TSBufEnable highlight')
+    vim.api.nvim_win_set_cursor(0, { 2, 59 })
     feedkey('|')
-    local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1,false)[2]
-    eq('    let test = fs::read_to_string("foo/bar").unwrap_or_else(|| {})',line)
+    local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
+    eq('    let test = fs::read_to_string("foo/bar").unwrap_or_else(|| {})', line)
   end)
 end)

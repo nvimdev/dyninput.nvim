@@ -69,6 +69,14 @@ local function ts_hl_match(type, word, opt)
   end
 end
 
+local function has_space_before(opt)
+  local before = vim.api.nvim_buf_get_text(opt.buf, opt.lnum, opt.col - 1, opt.lnum, opt.col, {})[1]
+  if before == ' ' then
+    return true
+  end
+  return false
+end
+
 return {
   ts_parent_node_type = ts_parent_node_type,
   ts_cursor_hl = ts_cursor_hl,
@@ -76,4 +84,5 @@ return {
   ts_cursor_node = ts_cursor_node,
   ts_blank_node_parent = ts_blank_node_parent,
   ts_hl_match = ts_hl_match,
+  has_space_before = has_space_before,
 }
