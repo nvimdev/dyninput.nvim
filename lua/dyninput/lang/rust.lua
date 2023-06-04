@@ -12,6 +12,7 @@ function rs.single_colon(opt)
   if
     (parent == 'let_declaration' and curnode and curnode:type() == 'identifier')
     or parent == 'parameters'
+    or (parent == 'mut_pattern' and curnode and curnode:type() == 'identifier')
   then
     return true
   end

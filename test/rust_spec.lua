@@ -141,6 +141,18 @@ describe('rust file', function()
     eq('where T: Display, U: Display', line)
   end)
 
+  it('after mut keyword in parameters', function()
+    vim.bo[bufnr].filetype = 'rust'
+    vim.api.nvim_buf_set_lines(bufnr,0,-1, false, {
+      'pub fn test(mut args) {}'
+    })
+    vim.cmd('TSBufEnable highlight')
+    vim.api.nvim_win_set_cursor(0, { 1, 19 })
+    feedkey(';')
+    line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
+    eq('pub fn test(mut args: ) {}', line)
+  end)
+
   it('in struct', function()
     vim.bo.filetype = 'rust'
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {

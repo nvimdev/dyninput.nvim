@@ -1,3 +1,4 @@
+local api = vim.api
 local treesitter = vim.treesitter
 
 local function ts_highlight_query(buf)
@@ -77,6 +78,11 @@ local function has_space_before(opt)
   return false
 end
 
+local function line_parts(opt)
+  local line = api.nvim_buf_get_text(opt.buf, opt.lnum - 1, 0, opt.lnum - 1, opt.col, {})[1]
+  return vim.split(line, '%s')
+end
+
 return {
   ts_parent_node_type = ts_parent_node_type,
   ts_cursor_hl = ts_cursor_hl,
@@ -85,4 +91,5 @@ return {
   ts_blank_node_parent = ts_blank_node_parent,
   ts_hl_match = ts_hl_match,
   has_space_before = has_space_before,
+  line_parts = line_parts,
 }
