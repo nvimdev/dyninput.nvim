@@ -122,14 +122,13 @@ More usage you can reference [my config](https://github.com/glepnir/nvim/blob/ma
 ## Contribute
 
 Thanks for contribute this plugin. most case need write a test for your patch. How to run test in
-local. `vusted` command is required
+local. `vusted` command is required, `vusted test` under `dyninput.nvim` dir
 
 ```
 luarocks --lua-version=5.1 install vusted
 ```
 
 For some dependcies like treesitter. you can use `DYNTEST` env variable to define a path in your
-local like `DYNTEST=/path/to/nvim-treesitter`. make sure it has parser otherwise test will auto
-download some parsers for test and install this dir
+local like `DYNTEST=/path/to/nvim-treesitter vusted test`.
 
 ## License MIT
