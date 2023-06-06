@@ -90,7 +90,7 @@ rs.closure_fn        -- match closure
 
 ### Write Own Context filter
 
-you can according Naming Conventions, tresitter node type or lsp symbols or
+you can according naming conventions, (AST)tresitter node type or lsp symbols or
 highlights or other the way that can detect which is the new characters need input.
 in `dyninput.util` there has some useful functions wrap can used. more detail can look at `util` module.
 
