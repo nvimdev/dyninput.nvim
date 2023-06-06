@@ -3,6 +3,10 @@
 Fucking Shift!!
 Dynamisc change the input according the context need neovim 0.10+
 
+![Untitled](https://github.com/nvimdev/dyninput.nvim/assets/41671631/96402303-f9eb-4485-81a1-843b9dc33605)
+
+input `\` it give me `||{}` and cursor between `|`. shift? you don't need then.
+
 ## Install
 
 must neovim 0.10+(head) version
