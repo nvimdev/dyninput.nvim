@@ -55,9 +55,10 @@ function rs.double_colon(opt)
   end
 end
 
-function rs.thin_arrow()
-  local line = api.nvim_get_current_line()
-  if line:find('^%s*[pub%s*]*fn') then
+function rs.thin_arrow(opt)
+  local parts = util.line_parts(opt)
+  local line = table.concat(parts, ' ')
+  if line:find('^%s*[pub%s*]*fn') and (parts[#parts]):find('%)$') then
     return true
   end
 end
