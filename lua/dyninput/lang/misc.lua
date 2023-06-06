@@ -13,9 +13,11 @@ function ms.has_space_before(opt)
   return util.find_space(opt)
 end
 
-function ms.semicolon_in_lua()
-  local text = api.nvim_get_current_line()
-  if text:sub(#text - 3, #text) == 'self' then
+function ms.semicolon_in_lua(opt)
+  local parts = util.line_parts(opt)
+  local word = parts[#parts]
+  local curnode = util.ts_cursor_node(opt)
+  if word == 'self' or (curnode and curnode:type() == 'identifier') then
     return true
   end
 end
