@@ -19,7 +19,10 @@ require('dyninput').setup({
       { ': ', rs.single_colon },
     },
     ['='] = { ' => ', rs.fat_arrow },
-    ['-'] = { ' -> ', rs.thin_arrow },
+    ['-'] = {
+      { ' -> ', rs.thin_arrow },
+      { '_', rs.snake_case },
+    },
     ['\\'] = { '|!| {}', rs.closure_fn },
   },
   lua = {

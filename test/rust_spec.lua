@@ -223,4 +223,17 @@ describe('rust file', function()
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
     eq('    let test = fs::read_to_string("foo/bar").unwrap_or_else(|| {})', line)
   end)
+
+  it('rust snake_case', function()
+    vim.bo[bufnr].filetype = 'rust'
+    set_buf_lines(bufnr, {
+      'fn main() {',
+      '    let snake',
+      '}',
+    })
+    vim.api.nvim_win_set_cursor(0, { 2, 13 })
+    feedkey('-')
+    local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
+    eq('    let snake_', line)
+  end)
 end)

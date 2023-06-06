@@ -83,6 +83,18 @@ local function line_parts(opt)
   return vim.split(line, '%s')
 end
 
+local function snake_case(opt)
+  local parts = line_parts(opt)
+  local word = parts[#parts]
+  if word:find('%d') then
+    return false
+  end
+
+  if word:find('^%a[%a%d_]*$') then
+    return true
+  end
+end
+
 return {
   ts_parent_node_type = ts_parent_node_type,
   ts_cursor_hl = ts_cursor_hl,
@@ -92,4 +104,5 @@ return {
   ts_hl_match = ts_hl_match,
   has_space_before = has_space_before,
   line_parts = line_parts,
+  snake_case = snake_case,
 }

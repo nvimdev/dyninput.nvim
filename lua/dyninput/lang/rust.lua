@@ -77,4 +77,8 @@ function rs.fat_arrow(opt)
   return true
 end
 
+function rs.snake_case(opt)
+  return util.snake_case(opt)
+end
+
 return rs
