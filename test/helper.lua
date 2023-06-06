@@ -44,7 +44,12 @@ local function treesitter_dep()
   end
 end
 
+local function set_buf_lines(bufnr, lines)
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+end
+
 return {
   feedkey = feedkey,
   treesitter_dep = treesitter_dep,
+  set_buf_lines = set_buf_lines,
 }

@@ -23,7 +23,7 @@ function rs.single_colon(opt)
   --match PascalCase
   local part = vim.split(line, '%s')
   local word = part[#part]
-  if word:find('^[A-Z]*$') then
+  if word:find('^[A-Z][a-zA-Z]*$') then
     return true
   end
 end

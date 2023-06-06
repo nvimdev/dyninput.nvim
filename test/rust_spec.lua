@@ -1,4 +1,5 @@
 local helper = require('test.helper')
+local set_buf_lines = helper.set_buf_lines
 local feedkey = helper.feedkey
 local eq = assert.equal
 
@@ -13,7 +14,7 @@ describe('rust file', function()
 
   it('double colon', function()
     vim.bo.filetype = 'rust'
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'fn main () {', '    let s = String', '}' })
+    set_buf_lines(bufnr, { 'fn main () {', '    let s = String', '}' })
     vim.api.nvim_win_set_cursor(0, { 2, 18 })
     vim.cmd('TSBufEnable highlight')
     feedkey(';')
@@ -42,7 +43,7 @@ describe('rust file', function()
 
   it('double colon after generic', function()
     vim.bo[bufnr].filetype = 'rust'
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+    set_buf_lines(bufnr, {
       'use std::collections::HashMap',
       'fn main(){',
       '    let v = HashMap::<i32, i32>',
@@ -57,13 +58,7 @@ describe('rust file', function()
 
   it('double colon after module', function()
     vim.bo.filetype = 'rust'
-    vim.api.nvim_buf_set_lines(
-      bufnr,
-      0,
-      -1,
-      false,
-      { 'mod module;', 'fn main(){', '    module', '}' }
-    )
+    set_buf_lines(bufnr, { 'mod module;', 'fn main(){', '    module', '}' })
     vim.cmd('TSBufEnable highlight')
     vim.api.nvim_win_set_cursor(0, { 3, 9 })
     feedkey(';')
@@ -73,7 +68,7 @@ describe('rust file', function()
 
   it('double colon after use namespace', function()
     vim.bo.filetype = 'rust'
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'use std::io;', 'fn main(){', '    io', '}' })
+    set_buf_lines(bufnr, { 'use std::io;', 'fn main(){', '    io', '}' })
     vim.treesitter.start(bufnr, 'rust')
     vim.treesitter.query.set(
       'rust',
@@ -124,7 +119,7 @@ describe('rust file', function()
     feedkey(';')
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[6]
     eq('    let test = Direction::Up;', line)
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'use std::io' })
+    set_buf_lines(bufnr, { 'use std::io' })
     vim.api.nvim_win_set_cursor(0, { 1, 10 })
     feedkey(';')
     line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
@@ -143,8 +138,8 @@ describe('rust file', function()
 
   it('after mut keyword in parameters', function()
     vim.bo[bufnr].filetype = 'rust'
-    vim.api.nvim_buf_set_lines(bufnr,0,-1, false, {
-      'pub fn test(mut args) {}'
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+      'pub fn test(mut args) {}',
     })
     vim.cmd('TSBufEnable highlight')
     vim.api.nvim_win_set_cursor(0, { 1, 19 })
@@ -169,7 +164,7 @@ describe('rust file', function()
 
   it('rust match arrow symbol', function()
     vim.bo.filetype = 'rust'
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+    set_buf_lines(bufnr, {
       'enum Direction {',
       '    Up,',
       '    Down,',
@@ -190,7 +185,7 @@ describe('rust file', function()
 
   it('rust thin arrow', function()
     vim.bo.filetype = 'rust'
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+    set_buf_lines(bufnr, {
       'fn test()',
     })
     vim.api.nvim_win_set_cursor(0, { 1, 9 })
@@ -217,7 +212,7 @@ describe('rust file', function()
 
   it('rust closure symbol', function()
     vim.bo[bufnr].filetype = 'rust'
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+    set_buf_lines(bufnr, {
       'fn main() {',
       '    let test = fs::read_to_string("foo/bar").unwrap_or_else()',
       '}',
