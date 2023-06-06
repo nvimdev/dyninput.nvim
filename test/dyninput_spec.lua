@@ -21,7 +21,7 @@ require('dyninput').setup({
     ['='] = { ' => ', rs.fat_arrow },
     ['-'] = {
       { ' -> ', rs.thin_arrow },
-      { '_', rs.snake_case },
+      { '_', ms.snake_case },
     },
     ['\\'] = { '|!| {}', rs.closure_fn },
   },

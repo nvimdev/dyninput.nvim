@@ -46,4 +46,8 @@ function ms.go_struct_field(opt)
   end
 end
 
+function ms.snake_case(opt)
+  return util.snake_case(opt)
+end
+
 return ms

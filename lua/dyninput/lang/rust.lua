@@ -3,7 +3,8 @@ local util = require('dyninput.util')
 local rs = {}
 
 function rs.single_colon(opt)
-  local line = api.nvim_get_current_line()
+  local parts = util.line_parts(opt)
+  local line = table.concat(parts)
   if line:find('%s*use$%s*') then
     return false
   end
@@ -21,8 +22,7 @@ function rs.single_colon(opt)
     return true
   end
   --match PascalCase
-  local part = vim.split(line, '%s')
-  local word = part[#part]
+  local word = parts[#parts]
   if word:find('^[A-Z][a-zA-Z]*$') then
     return true
   end
@@ -75,10 +75,6 @@ function rs.fat_arrow(opt)
     return
   end
   return true
-end
-
-function rs.snake_case(opt)
-  return util.snake_case(opt)
 end
 
 return rs
