@@ -20,12 +20,10 @@ function rs.single_colon(opt)
   if scope == 'struct_item' or scope == 'struct_expression' then
     return true
   end
-  --assume generic type is always upper letter
-  --work for where expression in newline like
-  --where T:Foo, U:Bar
+  --match PascalCase
   local part = vim.split(line, '%s')
   local word = part[#part]
-  if line:find('^where') and word:match('^[A-Z]$') then
+  if word:find('^[A-Z]*$') then
     return true
   end
 end
