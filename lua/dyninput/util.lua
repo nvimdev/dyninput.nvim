@@ -89,6 +89,9 @@ local function snake_case(opt)
   if word:find('%d') then
     return false
   end
+  if word:find('[%.%->]') then
+    word = word:match('[%.%->]+([%a_][%w_]*)')
+  end
 
   if word:find('^%a[%a%d_]*$') then
     return true
