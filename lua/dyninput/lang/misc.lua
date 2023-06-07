@@ -14,10 +14,12 @@ function ms.has_space_before(opt)
 end
 
 function ms.semicolon_in_lua(opt)
-  local parts = util.line_parts(opt)
-  local word = parts[#parts]
   local curnode = util.ts_cursor_node(opt)
-  if word == 'self' or (curnode and curnode:type() == 'identifier') then
+  if not curnode then
+    return
+  end
+  local word = util.ts_cursor_word(opt)
+  if word == 'self' or curnode:type() == 'identifier' then
     return true
   end
 end

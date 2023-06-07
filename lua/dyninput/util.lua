@@ -14,6 +14,14 @@ local function ts_cursor_node(opt)
   return curnode
 end
 
+local function ts_cursor_word(opt)
+  local curnode = ts_cursor_node(opt)
+  if not curnode then
+    return
+  end
+  return vim.treesitter.get_node_text(curnode, opt.buf)
+end
+
 local function ts_cursor_hl(opt)
   local res = vim.inspect_pos(opt.buf, opt.lnum - 1, opt.col - 1)
   return res.treesitter
@@ -93,7 +101,7 @@ local function snake_case(opt)
     word = word:match('[%.%->]+([%a_][%w_]*)')
   end
 
-  if word:find('^%a[%a%d_]*$') then
+  if word and word:find('^%a[%a%d_]*$') then
     return true
   end
 end
@@ -103,6 +111,7 @@ return {
   ts_cursor_hl = ts_cursor_hl,
   ts_highlight_query = ts_highlight_query,
   ts_cursor_node = ts_cursor_node,
+  ts_cursor_word = ts_cursor_word,
   ts_blank_node_parent = ts_blank_node_parent,
   ts_hl_match = ts_hl_match,
   has_space_before = has_space_before,

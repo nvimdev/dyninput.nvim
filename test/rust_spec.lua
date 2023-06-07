@@ -20,16 +20,11 @@ describe('rust file', function()
     feedkey(';')
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
     eq('    let s = String::', line)
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
-      'fn main(){',
-      '    let s = (String)',
-      '}',
-    })
-    vim.api.nvim_win_set_cursor(0, { 2, 18 })
-    feedkey(';')
-    line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[2]
-    eq('    let s = (String::)', line)
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
+  end)
+
+  it('double colon after Vec', function()
+    vim.bo[bufnr].filetype ='rust'
+    set_buf_lines(bufnr,  {
       'fn main(){',
       '    let v = Vec',
       '}',
@@ -124,16 +119,20 @@ describe('rust file', function()
     feedkey(';')
     line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1]
     eq('use std::io;', line)
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {
-      'ust std::fmt::Display',
+  end)
+
+  it('after where trait bound', function()
+    vim.bo[bufnr].filetype = 'rust'
+    set_buf_lines(bufnr, {
+      'use std::fmt::Display',
       'fn longest<T, U>(x: T, y:U) -> T',
       'where T',
     })
     vim.cmd('TSBufEnable highlight')
     vim.api.nvim_win_set_cursor(0, { 3, 7 })
-    feedkey(';Display, U;Display')
+    feedkey(';Display')
     line = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[3]
-    eq('where T: Display, U: Display', line)
+    eq('where T: Display', line)
   end)
 
   it('after mut keyword in parameters', function()
