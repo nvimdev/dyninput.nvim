@@ -50,7 +50,7 @@ end
 
 function ms.snake_case(opt)
   local curtype = util.ts_cursor_type(opt)
-  if curtype and curtype == 'string_literal' and curtype == 'string_content' then
+  if curtype and (curtype == 'string_literal' or curtype == 'string_content') then
     return false
   end
   return util.snake_case(opt)
