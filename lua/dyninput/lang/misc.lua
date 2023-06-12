@@ -3,14 +3,12 @@ local util = require('dyninput.util')
 local ms = {}
 
 function ms.c_struct_pointer(opt)
-  if not util.has_space_before(opt) then
+  local curtype = util.ts_cursor_type(opt)
+
+  if curtype and curtype ~= 'string_literal' and not util.has_space_before(opt) then
     return true
   end
   return false
-end
-
-function ms.has_space_before(opt)
-  return util.find_space(opt)
 end
 
 function ms.semicolon_in_lua(opt)
@@ -51,6 +49,10 @@ function ms.go_struct_field(opt)
 end
 
 function ms.snake_case(opt)
+  local curtype = util.ts_cursor_type(opt)
+  if curtype and curtype == 'string_literal' and curtype == 'string_content' then
+    return false
+  end
   return util.snake_case(opt)
 end
 

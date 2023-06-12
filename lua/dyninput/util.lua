@@ -14,6 +14,14 @@ local function ts_cursor_node(opt)
   return curnode
 end
 
+local function ts_cursor_type(opt)
+  local curnode = ts_cursor_node(opt)
+  if not curnode then
+    return
+  end
+  return curnode:type()
+end
+
 local function ts_cursor_word(opt)
   local curnode = ts_cursor_node(opt)
   if not curnode then
@@ -94,8 +102,14 @@ end
 local function snake_case(opt)
   local parts = line_parts(opt)
   local word = parts[#parts]
+  local curnode = ts_cursor_node(opt)
+  --ignore in string
+  if curnode and curnode:type() == 'string_literal' then
+    return
+  end
+
   if word:find('%d') then
-    return false
+    return
   end
   if word:find('[%.%->]') then
     word = word:match('[%.%->]+([%a_][%w_]*)')
@@ -111,6 +125,7 @@ return {
   ts_cursor_hl = ts_cursor_hl,
   ts_highlight_query = ts_highlight_query,
   ts_cursor_node = ts_cursor_node,
+  ts_cursor_type = ts_cursor_type,
   ts_cursor_word = ts_cursor_word,
   ts_blank_node_parent = ts_blank_node_parent,
   ts_hl_match = ts_hl_match,
