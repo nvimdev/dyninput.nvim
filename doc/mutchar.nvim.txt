@@ -1,4 +1,4 @@
-*mutchar.nvim.txt*          For NVIM v0.8.0          Last change: 2023 June 12
+*mutchar.nvim.txt*          For NVIM v0.8.0          Last change: 2023 June 15
 
 ==============================================================================
 Table of Contents                             *mutchar.nvim-table-of-contents*
