@@ -2,11 +2,24 @@ local api = vim.api
 local util = require('dyninput.util')
 local ms = {}
 
-function ms.c_struct_pointer(opt)
-  local curtype = util.ts_cursor_type(opt)
-
-  if curtype and curtype ~= 'string_literal' and not util.has_space_before(opt) then
-    return true
+function ms.is_pointer(opt)
+  local curnode = util.ts_cursor_node(opt)
+  if not curnode then
+    return
+  end
+  local curword = vim.treesitter.get_node_text(curnode, opt.buf)
+  local parent = curnode:parent()
+  while parent do
+    if parent:named_child_count() > 0 and util.ts_iter_all_children(parent, curword, opt) then
+      return true
+    end
+    parent = parent:parent()
+    if parent then
+      local _, _, erow = vim.treesitter.get_node_range(parent)
+      if erow < opt.lnum - 1 then
+        break
+      end
+    end
   end
   return false
 end

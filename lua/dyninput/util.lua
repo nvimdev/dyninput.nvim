@@ -120,6 +120,34 @@ local function snake_case(opt)
   end
 end
 
+local function ts_iter_all_children(tsnode, word, opt)
+  local function range_children(node)
+    if node:child_count() == 0 then
+      return
+    end
+    for n in node:iter_children() do
+      local text = vim.treesitter.get_node_text(n, opt.buf)
+      print(
+        vim.treesitter.get_node_text(n, opt.buf),
+        n:type(),
+        vim.treesitter.get_node_range(n),
+        word,
+        vim.treesitter.get_node_range(n),
+        n:parent():type()
+      )
+      if text == word and n:parent():type() == 'pointer_declarator' then
+        return true
+      end
+      local res = range_children(n)
+      if res then
+        return res
+      end
+    end
+  end
+
+  return range_children(tsnode)
+end
+
 return {
   ts_parent_node_type = ts_parent_node_type,
   ts_cursor_hl = ts_cursor_hl,
@@ -132,4 +160,5 @@ return {
   has_space_before = has_space_before,
   line_parts = line_parts,
   snake_case = snake_case,
+  ts_iter_all_children = ts_iter_all_children,
 }
