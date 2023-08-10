@@ -127,14 +127,6 @@ local function ts_iter_all_children(tsnode, word, opt)
     end
     for n in node:iter_children() do
       local text = vim.treesitter.get_node_text(n, opt.buf)
-      print(
-        vim.treesitter.get_node_text(n, opt.buf),
-        n:type(),
-        vim.treesitter.get_node_range(n),
-        word,
-        vim.treesitter.get_node_range(n),
-        n:parent():type()
-      )
       if text == word and n:parent():type() == 'pointer_declarator' then
         return true
       end
